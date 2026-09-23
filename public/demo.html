@@ -219,7 +219,7 @@ body {
    Matching Top Section of Uploaded Image
 ======================================================== */
 .hero {
-  background: linear-gradient(135deg, #1B4DEF 0%, #153FD6 40%, #0D2BA5 100%);
+  background: #1B4DEF;
   position: relative;
   padding: 56px 28px 120px 28px;
   overflow: hidden;
@@ -227,14 +227,7 @@ body {
 
 /* Subtle soft circular radial highlights like reference image */
 .hero::before {
-  content: '';
-  position: absolute;
-  top: -15%;
-  right: -5%;
-  width: 650px;
-  height: 650px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 65%);
-  pointer-events: none;
+  display: none;
 }
 
 .hero-inner {
@@ -1879,13 +1872,15 @@ footer {
 @media (max-width: 1024px) {
   .hero-inner {
     grid-template-columns: 1fr;
-    text-align: center;
+    text-align: left;
+    margin-left: -12px;
+    margin-right: 0;
   }
   .hero-left {
-    align-items: center;
+    align-items: flex-start;
   }
   .hero-actions {
-    justify-content: center;
+    justify-content: flex-start;
   }
   .bento-grid {
     grid-template-columns: 1fr;
