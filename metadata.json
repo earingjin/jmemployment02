@@ -1,0 +1,8 @@
+{
+  "name": "JMCAREER 고용서비스",
+  "description": "공공 고용서비스 및 전문 취업 컨설팅 JMCAREER 웹사이트 데모",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
