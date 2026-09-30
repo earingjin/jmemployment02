@@ -1,12 +1,13 @@
 import logo from '../../assets/제이엠커리어 로고.png';
-import { PROGRAMS } from '../../data/programs';
 import type { View } from '../../pages/HomePage';
 
-export function Header({ view, onHome, onProgram, onEmployer, onBranch, onConsult }: {
+export function Header({ view, onHome, onBenefits, onPrograms, onSmartCare, onEthics, onBranch, onConsult }: {
   view: View;
   onHome: () => void;
-  onProgram: (programId: string) => void;
-  onEmployer: () => void;
+  onBenefits: () => void;
+  onPrograms: () => void;
+  onSmartCare: () => void;
+  onEthics: () => void;
   onBranch: () => void;
   onConsult: () => void;
 }) {
@@ -21,8 +22,10 @@ export function Header({ view, onHome, onProgram, onEmployer, onBranch, onConsul
         <nav className="gnb">
           <span id="pv-nav-programs" className="gnb-programs">
             <button className={'gnb-item' + (view === 'home' ? ' active' : '')} id="gnbHomeBtn" onClick={onHome}>홈</button>
-            {PROGRAMS.map(p => <button key={p.id} className="gnb-item" onClick={() => onProgram(p.id)}>{p.label}</button>)}
-            <button className={'gnb-item gnb-employer' + (view === 'employer' ? ' active' : '')} id="gnbEmployerBtn" onClick={onEmployer}>기업 지원금</button>
+            <button className="gnb-item" onClick={onBenefits}>수당 안내</button>
+            <button className="gnb-item" onClick={onPrograms}>지원제도</button>
+            <button className={'gnb-item' + (view === 'smartcare' ? ' active' : '')} onClick={onSmartCare}>SmartCare</button>
+            <button className="gnb-item" onClick={onEthics}>윤리 정보</button>
           </span>
           <button className={'branch-toggle' + (view === 'branch' ? ' active' : '')} id="gnbBranchBtn" onClick={onBranch}>전국지사</button>
         </nav>

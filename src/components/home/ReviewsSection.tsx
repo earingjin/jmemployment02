@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { REVIEWS, STATS } from '../../data/content';
+import { REVIEWS } from '../../data/content';
 
 const NAV_BUTTON_STYLE = { width: '38px', height: '38px', borderRadius: '50%', background: '#F5F5F4', border: 'none', cursor: 'pointer', fontSize: '16px' };
 
@@ -48,10 +48,6 @@ export function ReviewsSection({ onOpenReview }: { onOpenReview: (index: number)
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="stats-strip-yellow" id="pv-stats-strip">
-          {STATS.map(s => <div key={s.label} className="stat-item"><div className="num">{s.num}</div><div className="label">{s.label}</div></div>)}
         </div>
       </div>
     </section>

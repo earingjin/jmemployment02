@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/smartcare", "destination": "/index.html" },
+    { "source": "/employment-support", "destination": "/index.html" }
+  ]
+}

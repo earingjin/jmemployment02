@@ -32,7 +32,7 @@ const CARD_VISUALS: Record<SmartSolutionKey, ReactNode> = {
 };
 
 // AI & 스마트 커리어 솔루션 카드 4종
-export function SmartCareSection({ onOpen }: { onOpen: (key: SmartSolutionKey) => void }) {
+export function SmartCareSection({ onDetail }: { onDetail: () => void }) {
   return (
     <section className="sec-products-wrap">
       <div className="ribbon-badge-center">
@@ -40,12 +40,12 @@ export function SmartCareSection({ onOpen }: { onOpen: (key: SmartSolutionKey) =
       </div>
       <div className="sec-header-center">
         <h2>취업 준비의 모든 단계, 스마트하게 완성</h2>
-        <p>10만 건 합격 빅데이터와 전문 진단 도구로 서류부터 실전 면접까지 든든하게 준비합니다.</p>
+        <p>합격 빅데이터와 전문 진단 도구로 서류부터 실전 면접까지 든든하게 준비합니다.</p>
       </div>
 
       <div className="product-cards-grid">
         {SMART_SOLUTIONS.map(s => (
-          <div key={s.key} className="white-prod-card" onClick={() => onOpen(s.key)}>
+          <div key={s.key} className="white-prod-card">
             <div>
               <div className="wpc-top">
                 <span className="wpc-cat-badge">{s.card.category}</span>
@@ -59,10 +59,13 @@ export function SmartCareSection({ onOpen }: { onOpen: (key: SmartSolutionKey) =
             </div>
             <div className="wpc-footer">
               <span className="feature-text">{s.card.feature}</span>
-              <div className="arrow-btn">→</div>
+              <div className="arrow-btn" aria-hidden="true">→</div>
             </div>
           </div>
         ))}
+      </div>
+      <div className="smart-care-more">
+        <button className="btn-pill-dark" onClick={onDetail}>SmartCare 자세히 보기 →</button>
       </div>
     </section>
   );

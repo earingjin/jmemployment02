@@ -38,9 +38,9 @@ export interface PressNews {
 }
 
 export const PRESS_NEWS: PressNews[] = [
-  { category: "보도자료", date: "2026.03.15", title: "JMCAREER, 2026년 청년 취업지원 우수기관 선정", detail: "JMCAREER가 고용노동부 주관 2026년 청년 취업지원 우수기관으로 선정되었습니다. 전국 19개 지사의 상담 데이터와 재취업 연계 성과를 바탕으로 우수성을 인정받았습니다." },
+  { category: "보도자료", date: "2026.03.15", title: "JMCAREER, 2026년 청년 취업지원 우수기관 선정", detail: "JMCAREER가 고용노동부 주관 2026년 청년 취업지원 우수기관으로 선정되었습니다. 전국 지사의 상담 데이터와 재취업 연계 성과를 바탕으로 우수성을 인정받았습니다." },
   { category: "MOU체결", date: "2026.05.02", title: "JMCAREER, 주요 대학과 취업지원 업무협약 체결", detail: "JMCAREER는 전국 주요 대학과 재학생 및 졸업생을 위한 취업지원 업무협약(MOU)을 체결했습니다." },
-  { category: "보도자료", date: "2026.06.20", title: "JMCAREER, 전국 19개 지사 네트워크 통합 운영", detail: "JMCAREER가 전국 19개 지사 체계를 완비하며 전문 취업지원 접근성을 크게 높였습니다." }
+  { category: "보도자료", date: "2026.06.20", title: "JMCAREER, 전국 지사 네트워크 통합 운영", detail: "JMCAREER가 전국 지사 체계를 완비하며 전문 취업지원 접근성을 크게 높였습니다." }
 ];
 
 // 공지사항 (원본 commonData.news)
@@ -73,9 +73,9 @@ export const SMART_SOLUTIONS: SmartSolution[] = [
         "진단 결과를 바탕으로 한 커리어 방향 제안"
       ] } },
   { key: 'coverletter', title: "AI 자기소개서",
-    card: { category: "AI 서류완성", summary: "10만 건 합격 빅데이터 기반 맞춤형 전략 첨삭 및 스토리라인을 완성합니다.", feature: "무제한 첨삭 연계" },
+    card: { category: "AI 서류완성", summary: "합격 빅데이터 기반 맞춤형 전략 첨삭 및 스토리라인을 완성합니다.", feature: "무제한 첨삭 연계" },
     modal: {
-      desc: "JMCAREER AI는 실제 합격한 10만건의 빅데이터를 바탕으로 자기소개서를 전략적으로 완성합니다.",
+      desc: "JMCAREER AI는 실제 합격 빅데이터를 바탕으로 자기소개서를 전략적으로 완성합니다.",
       list: [
         "실제 합격 자소서 데이터를 학습한 맞춤 첨삭",
         "지원 직무별 핵심 키워드 자동 제안",
@@ -93,11 +93,11 @@ export const SMART_SOLUTIONS: SmartSolution[] = [
         "상담사의 실제 면접관 시각 피드백 반영"
       ] } },
   { key: 'aptitude', title: "AI NCS / 인적성검사",
-    card: { category: "인적성·NCS", summary: "3,000개 문항 기반 기업별 출제 유형에 맞춰 모의고사를 직접 구성합니다.", feature: "약점 진단 & 보완" },
+    card: { category: "인적성·NCS", summary: "NCS 문항 기반 기업별 출제 유형에 맞춰 모의고사를 직접 구성합니다.", feature: "약점 진단 & 보완" },
     modal: {
-      desc: "3,000개에 달하는 방대한 NCS문항을 바탕으로 각 기업별 출제 유형에 맞게 문항을 구성하고 커리어방향을 제시합니다.",
+      desc: "방대한 NCS 문항을 바탕으로 각 기업별 출제 유형에 맞게 문항을 구성하고 커리어방향을 제시합니다.",
       list: [
-        "3,000여 개 NCS 문항 데이터베이스 보유",
+        "NCS 문항 데이터베이스 보유",
         "기업별 출제 유형에 맞춘 AI 맞춤 문항 구성",
         "성향·역량 진단을 통한 강점/보완점 분석",
         "진단 결과를 바탕으로 한 전문 상담사 매칭"

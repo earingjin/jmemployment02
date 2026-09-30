@@ -10,7 +10,7 @@ export function NetworkSection({ onBranch, onConsult, onEmployer }: {
         <div className="sec-header-center">
           <span className="eyebrow">OUR STORY &amp; NETWORK</span>
           <h2>제이엠커리어 네트워크 &amp; 스토리</h2>
-          <p>전국 19개 지사, 1:1 맞춤 상담, 산학협력으로 취업의 전 과정을 지원합니다.</p>
+          <p>전국 지사, 1:1 맞춤 상담, 산학협력으로 취업의 전 과정을 지원합니다.</p>
         </div>
 
         <div className="three-cards-grid">
@@ -24,7 +24,7 @@ export function NetworkSection({ onBranch, onConsult, onEmployer }: {
             </div>
             <div className="spc-body">
               <div>
-                <h3>전국 19개 지사 네트워크</h3>
+                <h3>전국 지사 네트워크</h3>
                 <p>서울 본사부터 수도권, 충청, 영남, 호남까지 가까운 지사에서 방문 상담과 신청을 지원합니다.</p>
               </div>
               <span className="spc-link-btn">내 주변 지사 찾기 →</span>
@@ -58,7 +58,7 @@ export function NetworkSection({ onBranch, onConsult, onEmployer }: {
             </div>
             <div className="spc-body">
               <div>
-                <h3>126개 협약 기업 &amp; 산학협력</h3>
+                <h3>협약 기업 &amp; 산학협력</h3>
                 <p>주요 대학 및 우수 기업과의 MOU를 통해 수료생 우선 추천 및 실전 채용 기회를 제공합니다.</p>
               </div>
               <span className="spc-link-btn">기업 지원 혜택 보기 →</span>

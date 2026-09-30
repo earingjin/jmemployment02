@@ -40,7 +40,7 @@ export function ProgramSection({ onProgram, onEmployer }: {
   onEmployer: () => void;
 }) {
   return (
-    <section className="sec-bento">
+    <section className="sec-bento" id="programs">
       <div className="sec-bento-inner">
         <div className="sec-header-center">
           <span className="eyebrow">GOVERNMENT PROGRAM</span>
