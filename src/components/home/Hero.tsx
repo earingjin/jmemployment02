@@ -19,29 +19,38 @@ export function Hero({ onConsult, onBranch, onDetail }: {
         <div className="hero-left">
           <span className="hero-benefit-eyebrow">국민취업지원제도</span>
           <h1 className="hero-title" id="pv-hero-headline">
-            취업 준비 중이라면<br />
-            <span className="highlight">받을 수 있는 지원부터<br />확인하세요</span>
+            취업이 막막할 때<br />
+            <span className="highlight">국민취업지원제도 상담부터</span>
           </h1>
           <p className="hero-desc">
-            참여 유형과 요건에 따라 받을 수 있는<br />
-            수당과 취업지원 내용을 확인해보세요.
+            국민취업지원제도 최대 360만원 혜택받기<br />
+            취업지원금, 받을 수 있는지 지금 확인하세요
           </p>
 
           <div className="hero-benefit-grid">
             {BENEFIT_GROUPS.map(group => (
               <div className={'hero-benefit-card' + (group.type === 'Ⅰ유형' ? ' primary' : '')} key={group.type}>
-                <span className="hero-benefit-type">{group.type}</span>
-                <strong className="hero-benefit-name">{group.items.join(' · ')}</strong>
-                {group.sub && <span className="hero-benefit-sub">{group.sub}</span>}
-                {group.headline && <div className="hero-benefit-headline">{group.headline}</div>}
-                {group.heroNote && <p className="hero-benefit-hint">{group.heroNote}</p>}
+                <div className="hero-benefit-top">
+                  <strong className="hero-benefit-name">{group.items.join(' · ')}</strong>
+                </div>
+                <div className="hero-benefit-divider" />
+                <div className="hero-benefit-core">
+                  {group.headline ? <strong>{group.headline}</strong> : group.sub?.split(' · ').map((item, index) => (
+                    <strong key={item}>{index === 0 ? item : `+ ${item}`}</strong>
+                  ))}
+                </div>
+                <div className="hero-benefit-divider" />
+                <div className="hero-benefit-bottom">
+                  <span className="hero-benefit-type">{group.heroType}</span>
+                  <span className="hero-benefit-hint">{group.heroBottom}</span>
+                </div>
               </div>
             ))}
           </div>
 
           <div className="hero-actions">
             <button className="btn-pill-dark" onClick={onConsult}>
-              내가 받을 수 있는 지원 확인하기
+              상담 신청하기
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
             </button>
             <button className="btn-pill-outline" onClick={onDetail}>

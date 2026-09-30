@@ -1,13 +1,7 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { PROGRAM_CARDS, type ProgramCardVariant } from '../../data/programs';
 
-// 원본 applyProgramCardCopy()가 런타임에 적용하던 인라인 스타일을 그대로 재현
-const GRID_STYLE: CSSProperties = { gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' };
-const CARD_STYLE: CSSProperties = { minHeight: '230px', padding: '23px', background: '#FFFFFF', borderColor: '#DCE5F1', boxShadow: 'none' };
-const TITLE_STYLE: CSSProperties = { fontSize: '20px', color: '#0A1E7A' };
-const DESC_STYLE: CSSProperties = { fontSize: '13px', color: '#64748B' };
-const AMOUNT_STYLE: CSSProperties = { fontSize: '21px', color: '#1E50FF' };
-const BADGE_STYLE: CSSProperties = { display: 'none' };
+// 카드 스타일은 global.css의 '.sec-bento' 규칙에서만 정의한다(인라인 스타일 없음).
 
 // 원본 카드 일러스트 (CSS로 숨김 처리되어 있음)
 const ART: Record<Exclude<ProgramCardVariant, 'peach'>, ReactNode> = {
@@ -34,7 +28,7 @@ const ART: Record<Exclude<ProgramCardVariant, 'peach'>, ReactNode> = {
   )
 };
 
-// 2026 핵심 취업지원 프로그램 카드 4종
+// 2026 핵심 취업지원 프로그램 카드 4종 (카드 클릭 → 사업 상세 페이지, 네 번째 카드의 버튼 → 기업 지원금)
 export function ProgramSection({ onProgram, onEmployer }: {
   onProgram: (programId: string) => void;
   onEmployer: () => void;
@@ -48,15 +42,15 @@ export function ProgramSection({ onProgram, onEmployer }: {
           <p>구직자 유형과 희망 진로에 맞춘 정부 공식 지원 제도입니다. 클릭 시 상세 혜택과 신청 요건을 바로 확인하실 수 있습니다.</p>
         </div>
 
-        <div className="bento-grid" style={GRID_STYLE}>
+        <div className="bento-grid">
           {PROGRAM_CARDS.map(card => (
-            <div key={card.variant} className={'bento-card ' + card.variant} onClick={() => onProgram(card.openProgramId)} style={CARD_STYLE}>
+            <div key={card.variant} className={'bento-card ' + card.variant} onClick={() => onProgram(card.openProgramId)}>
               <div className="bento-top">
                 <div className="bento-title-group">
                   <span className="bento-label">{card.category}</span>
-                  <h3 style={TITLE_STYLE}>{card.title}</h3>
+                  <h3>{card.title}</h3>
                 </div>
-                <span className="bento-badge" style={BADGE_STYLE}>{card.hiddenBadge}</span>
+                <span className="bento-badge">{card.hiddenBadge}</span>
               </div>
               {card.variant === 'peach' ? (
                 // 네 번째 카드는 원본의 체크리스트 + 버튼 구조를 유지
@@ -69,8 +63,8 @@ export function ProgramSection({ onProgram, onEmployer }: {
               ) : (
                 <div className="bento-body">
                   <div className="bento-info">
-                    <div className="amount" style={AMOUNT_STYLE}>{card.amount}</div>
-                    <div className="desc" style={DESC_STYLE}>{card.description}</div>
+                    <div className="amount">{card.amount}</div>
+                    <div className="desc">{card.description}</div>
                   </div>
                   <div className="bento-art">{ART[card.variant]}</div>
                 </div>

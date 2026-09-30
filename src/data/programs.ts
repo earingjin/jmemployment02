@@ -44,11 +44,11 @@ export interface Program {
 // headline: Hero/상세 페이지에서 금액을 우선 인지시키기 위한 대표 숫자. lines에 포함된 값을 그대로 발췌한 것이며 별도로 계산·합산하지 않는다.
 // heroNote: Hero 카드용 한 줄 보조문구(세부 조건은 상세 페이지의 lines에서 확인). 새로운 정책 내용이 아니라 lines[1]의 축약 표현이다.
 export const BENEFIT_GROUPS = [
-  { type: 'Ⅰ유형', items: ['구직촉진수당'], sub: null, headline: '최대 360만원', heroNote: '부양가족 해당 시 추가 지원',
+  { type: 'Ⅰ유형', items: ['구직촉진수당'], sub: null, headline: '최대 360만원', heroNote: '부양가족 해당 시 추가 지원', heroType: 'Ⅰ유형 대상', heroBottom: '부양가족 추가 지원',
     lines: ['월 60만원 × 6개월 (최대 360만원)', '부양가족(18세 이하·70세 이상·중증장애인) 1인당 10만원 추가 (최대 40만원)'] },
-  { type: 'Ⅱ유형', items: ['취업활동비용'], sub: '참여수당 · 참여장려수당', headline: null, heroNote: null,
+  { type: 'Ⅱ유형', items: ['취업활동비용'], sub: '참여수당 · 참여장려수당', headline: null, heroNote: null, heroType: 'Ⅱ유형 대상', heroBottom: '참여 프로그램별 지급',
     lines: ['참여수당: 기본 15만원 + 참여 프로그램에 따라 3~10만원 추가', '참여장려수당: 월 1회 2만원, 최대 5회 (총 10만원)'] },
-  { type: 'Ⅰ·Ⅱ유형 일부 대상', items: ['취업성공수당'], sub: null, headline: '최대 150만원', heroNote: null,
+  { type: 'Ⅰ·Ⅱ유형 일부 대상', items: ['취업성공수당'], sub: null, headline: '최대 150만원', heroNote: null, heroType: 'Ⅰ·Ⅱ유형 일부 대상', heroBottom: '지급요건 충족 시',
     lines: ['6개월 근속 50만원 + 12개월 근속 100만원 (최대 150만원)', 'Ⅰ·Ⅱ유형 참여자 중 중위소득 60% 이하 등 요건 충족자'] }
 ];
 

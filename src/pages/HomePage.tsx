@@ -19,17 +19,17 @@ import { ProgramModal, type Audience } from '../components/modals/ProgramModal';
 import { ReviewModal } from '../components/modals/ReviewModal';
 import { BranchDirectoryView } from '../components/views/BranchDirectoryView';
 import { EmployerView } from '../components/views/EmployerView';
-import { EmploymentSupportPage } from './EmploymentSupportPage';
+import { VIEW_PATHS, isProgramView, viewFromPath, type View } from '../data/navigation';
+import { ProgramDetailPage } from './ProgramDetailPage';
 import { SmartCarePage } from './SmartCarePage';
 
-// 기존 화면 상태에 SmartCare/국민취업지원제도 상세 페이지를 History API로 추가한다.
-export type View = 'home' | 'branch' | 'employer' | 'smartcare' | 'employment-support';
+export type { View };
 
-const viewFromPath = (): View => {
-  if (window.location.pathname === '/smartcare') return 'smartcare';
-  if (window.location.pathname === '/employment-support') return 'employment-support';
-  return 'home';
-};
+// 현재 URL에 대응하는 화면 (URL ↔ View 매핑은 src/data/navigation.ts)
+const currentView = () => viewFromPath(window.location.pathname);
+
+// 같은 URL을 다시 누르면 history 항목을 중복으로 쌓지 않는다(뒤로가기 시 URL과 화면 불일치 방지)
+const pushPath = (path: string) => { if (window.location.pathname !== path) window.history.pushState({}, '', path); };
 
 // 공개 사이트 전체 (원본 #publicPage)
 export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
@@ -38,7 +38,7 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
   benefitYear: string;
   onShowAdmin: () => void;
 }) {
-  const [view, setView] = useState<View>(viewFromPath);
+  const [view, setView] = useState<View>(currentView);
   const [bdRegion, setBdRegion] = useState('전체');
   const [programModal, setProgramModal] = useState<{ open: boolean; programId: string | null; audience: Audience }>({ open: false, programId: null, audience: 'seeker' });
   const [reviewModal, setReviewModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
@@ -49,26 +49,28 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
   const contactRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const onPopState = () => setView(viewFromPath());
+    const onPopState = () => setView(currentView());
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
   const scrollTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const openBranchDirectory = (region?: string) => {
-    if (region) setBdRegion(region);
-    setView('branch');
+  // 모든 화면 전환의 단일 진입점: URL 변경 + 화면 전환 + 상단 이동
+  const navigate = (next: View) => {
+    pushPath(VIEW_PATHS[next]);
+    setView(next);
     scrollTop();
   };
-  const closeBranchDirectory = () => setView('home');
-  const goHome = () => { window.history.pushState({}, '', '/'); closeBranchDirectory(); scrollTop(); };
-  const openEmployerPage = () => { setView('employer'); scrollTop(); };
-  const openSmartCare = () => { window.history.pushState({}, '', '/smartcare'); setView('smartcare'); scrollTop(); };
-  const openEmploymentSupportPage = () => { window.history.pushState({}, '', '/employment-support'); setView('employment-support'); scrollTop(); };
+  const goHome = () => navigate('home');
+  // Footer 지사 목록에서는 해당 지사의 권역을 선택한 상태로 전국지사를 연다
+  const openBranchDirectory = (region?: string) => {
+    if (region) setBdRegion(region);
+    navigate('branch');
+  };
 
   const goToSection = (id: string) => {
-    window.history.pushState({}, '', '/');
+    pushPath('/');
     setView('home');
     setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
   };
@@ -82,7 +84,7 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
   // 원본 goToConsult(): 프로그램 모달만 닫고(다른 모달은 유지) 홈으로 돌아간 뒤 상담 영역으로 스크롤
   const goToConsult = () => {
     closeProgramDetail();
-    window.history.pushState({}, '', '/');
+    pushPath('/');
     setView('home');
     setTimeout(() => contactRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 40);
   };
@@ -103,22 +105,22 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
 
   return (
     <div id="publicPage" style={hidden ? { display: 'none' } : undefined}>
-      <Header view={view} onHome={goHome} onBenefits={() => goToSection('benefits')} onPrograms={() => goToSection('programs')}
-        onSmartCare={openSmartCare} onEthics={() => goToSection('ethics')} onBranch={() => openBranchDirectory()} onConsult={goToConsult} />
+      <Header view={view} onNavigate={navigate} onConsult={goToConsult} />
 
       <div className={'page' + (view !== 'home' ? ' sub-mode' : '')}>
         <EmployerView active={view === 'employer'} benefitYear={benefitYear} onDetail={id => openProgramDetail(id, 'employer')} onConsult={goToConsult} />
         <BranchDirectoryView active={view === 'branch'} branches={branches} region={bdRegion} onRegion={setBdRegion} onOpenMap={openBranchMap} />
         {view === 'smartcare' && <SmartCarePage onBack={goHome} onConsult={goToConsult} />}
-        {view === 'employment-support' && <EmploymentSupportPage onBack={goHome} onConsult={goToConsult} />}
+        {isProgramView(view) && <ProgramDetailPage key={view} programId={view} onBack={goHome} onConsult={goToConsult} />}
 
-        <Hero onConsult={goToConsult} onBranch={() => openBranchDirectory()} onDetail={openEmploymentSupportPage} />
+        <Hero onConsult={goToConsult} onBranch={() => openBranchDirectory()} onDetail={() => navigate('employment-support')} />
         <VideoGuide />
         {/* 기존 BenefitSection과 내용이 중복되어 Hero로 통합했다. 컴포넌트 파일은 삭제하지 않고 렌더링만 하지 않는다. */}
-        <ProgramSection onProgram={id => openProgramDetail(id)} onEmployer={openEmployerPage} />
-        <SmartCareSection onDetail={openSmartCare} />
+        {/* 사업 카드는 Header와 동일한 사업 상세 페이지로 이동한다 */}
+        <ProgramSection onProgram={id => { if (isProgramView(id)) navigate(id); }} onEmployer={() => navigate('employer')} />
+        <SmartCareSection onDetail={() => navigate('smartcare')} />
         <ReviewsSection onOpenReview={index => setReviewModal({ open: true, index })} />
-        <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={openEmployerPage} />
+        <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={() => navigate('employer')} />
         <NewsSection onOpenPress={index => setPressModal({ open: true, index })} />
         <ConsultationSection branches={branches} sectionRef={contactRef} />
         <EthicsSection />

@@ -1,6 +1,11 @@
 {
   "rewrites": [
-    { "source": "/smartcare", "destination": "/index.html" },
-    { "source": "/employment-support", "destination": "/index.html" }
+    { "source": "/employment-support", "destination": "/index.html" },
+    { "source": "/job-leap", "destination": "/index.html" },
+    { "source": "/future-experience", "destination": "/index.html" },
+    { "source": "/senior-internship", "destination": "/index.html" },
+    { "source": "/employer-support", "destination": "/index.html" },
+    { "source": "/branches", "destination": "/index.html" },
+    { "source": "/smartcare", "destination": "/index.html" }
   ]
 }

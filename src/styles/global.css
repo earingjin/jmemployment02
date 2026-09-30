@@ -178,6 +178,19 @@ body {
   border-color: rgba(255, 255, 255, 0.45);
 }
 
+/* 전국지사(/branches)도 다른 GNB 메뉴와 같은 방식으로 현재 페이지를 표시 */
+.branch-toggle.active {
+  background: var(--royal-main);
+  border-color: var(--royal-main);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(30, 80, 255, 0.4);
+}
+
+.gnb-item,
+.branch-toggle {
+  white-space: nowrap;
+}
+
 .nav-right {
   display: flex;
   align-items: center;
@@ -475,10 +488,6 @@ body {
     /* 하단 곡선 장식(138px)과 겹치지 않도록 데스크톱과 동일하게 여백 확보 */
     padding: 64px 28px 160px;
   }
-
-  .hero-benefit-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ========================================================
@@ -499,20 +508,33 @@ body {
   width: fit-content;
 }
 
-/* Desktop/Tablet: 3열 가로 배치, Mobile(760px 이하)에서만 위 미디어쿼리로 1열 전환 */
+/* Desktop/Tablet: 3열 가로 배치, Mobile(760px 이하): 1열
+   (1열 규칙은 기본 규칙보다 뒤에 있어야 적용되므로 바로 아래에 둔다) */
 .hero-benefit-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: 22px;
+  /* 1024px 이하에서 .hero-left가 align-items: flex-start라 폭이 줄어들지 않도록 컬럼 폭을 채운다 */
+  align-self: stretch;
+}
+
+@media (max-width: 760px) {
+  .hero-benefit-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .hero-benefit-card {
   background: var(--white);
   border: 1px solid #DCE5F1;
   border-radius: var(--radius-lg);
-  padding: 14px 12px;
+  min-height: 214px;
+  padding: 16px;
   box-shadow: var(--shadow-card);
+  display: grid;
+  grid-template-rows: auto 1px minmax(82px, 1fr) 1px auto;
+  text-align: left;
 }
 
 /* 1유형(구직촉진수당)이 가장 먼저 인지되도록 강조 */
@@ -521,43 +543,47 @@ body {
   background: #F0F5FF;
 }
 
-.hero-benefit-type {
-  display: inline-block;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--slate-500);
-}
-
 .hero-benefit-name {
   display: block;
-  margin-top: 2px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   color: #0A1E7A;
   line-height: 1.3;
 }
 
-.hero-benefit-sub {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--slate-500);
-  line-height: 1.4;
+.hero-benefit-divider {
+  background: #DCE5F1;
+  margin: 13px 0;
 }
 
-/* 설명보다 금액이 먼저 보이도록 카드 안에서 가장 크고 진한 요소로 표시 */
-.hero-benefit-headline {
-  margin-top: 8px;
-  font-size: 21px;
-  font-weight: 900;
-  letter-spacing: -0.4px;
+.hero-benefit-core {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   color: #0A1E7A;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  line-height: 1.23;
 }
 
-/* 세부 지급조건은 상세 페이지에서 확인 — Hero 카드에는 한 줄 보조문구만 표시 */
-.hero-benefit-hint {
-  margin-top: 6px;
+.hero-benefit-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hero-benefit-type {
   font-size: 11.5px;
+  font-weight: 600;
+  color: var(--slate-500);
+  line-height: 1.35;
+}
+
+.hero-benefit-hint {
+  font-size: 11.5px;
+  font-weight: 400;
   color: var(--slate-500);
   line-height: 1.4;
 }
@@ -2416,17 +2442,19 @@ footer {
   }
 }
 
-/* ===== <style id="program-cards-final-layout"> (원본 두 번째 style 블록) ===== */
-  .sec-bento .bento-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 16px !important; }
-  .sec-bento .bento-card { min-height: 230px !important; padding: 23px !important; background: #fff !important; border-color: #dce5f1 !important; box-shadow: none !important; }
-  .sec-bento .bento-card.yellow { background: #fff !important; border-color: #dce5f1 !important; }
-  .sec-bento .bento-card .bento-art, .sec-bento .bento-card .bento-badge { display: none !important; }
-  .sec-bento .bento-card .bento-top { margin-bottom: 0 !important; }
-  .sec-bento .bento-card .bento-body { display: block !important; margin-top: auto !important; }
-  .sec-bento .bento-card h3, .sec-bento .bento-card.yellow h3 { color: #0a1e7a !important; font-size: 20px !important; line-height: 1.35 !important; }
-  .sec-bento .bento-card .amount, .sec-bento .bento-card.yellow .amount { color: #1e50ff !important; font-size: 21px !important; line-height: 1.35 !important; }
-  .sec-bento .bento-card .desc, .sec-bento .bento-card.yellow .desc { color: #64748b !important; font-size: 13px !important; line-height: 1.55 !important; }
-  .sec-bento .bento-card.peach .bento-checklist { margin: 0 0 13px !important; }
-  .sec-bento .bento-card.peach .bento-checklist li { color: #64748b !important; font-size: 13px !important; }
-  .sec-bento .bento-card.peach .btn-peach-cta { padding: 8px 13px !important; font-size: 12px !important; box-shadow: none !important; }
-  @media (max-width: 760px) { .sec-bento .bento-grid { grid-template-columns: 1fr !important; } }
+/* ===== 홈 사업 카드(ProgramSection) 최종 스타일 — 원본 두 번째 style 블록 =====
+   카드 스타일의 단일 기준. 이전에는 이 블록(!important) + ProgramSection 인라인 스타일로 이중 정의되어 있었다.
+   파일 맨 끝에 있고 선택자 명시도(.sec-bento ...)가 기본 .bento-* 규칙 이상이므로 !important 없이 동일하게 적용된다. */
+  .sec-bento .bento-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .sec-bento .bento-card { min-height: 230px; padding: 23px; background: #fff; border-color: #dce5f1; box-shadow: none; }
+  .sec-bento .bento-card.yellow { background: #fff; border-color: #dce5f1; }
+  .sec-bento .bento-card .bento-art, .sec-bento .bento-card .bento-badge { display: none; }
+  .sec-bento .bento-card .bento-top { margin-bottom: 0; }
+  .sec-bento .bento-card .bento-body { display: block; margin-top: auto; }
+  .sec-bento .bento-card h3, .sec-bento .bento-card.yellow h3 { color: #0a1e7a; font-size: 20px; line-height: 1.35; }
+  .sec-bento .bento-card .amount, .sec-bento .bento-card.yellow .amount { color: #1e50ff; font-size: 21px; line-height: 1.35; }
+  .sec-bento .bento-card .desc, .sec-bento .bento-card.yellow .desc { color: #64748b; font-size: 13px; line-height: 1.55; }
+  .sec-bento .bento-card.peach .bento-checklist { margin: 0 0 13px; }
+  .sec-bento .bento-card.peach .bento-checklist li { color: #64748b; font-size: 13px; }
+  .sec-bento .bento-card.peach .btn-peach-cta { padding: 8px 13px; font-size: 12px; box-shadow: none; }
+  @media (max-width: 760px) { .sec-bento .bento-grid { grid-template-columns: 1fr; } }
