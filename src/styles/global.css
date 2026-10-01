@@ -531,9 +531,52 @@ body {
 }
 
 @media (max-width: 760px) {
-  .hero-benefit-grid {
-    grid-template-columns: 1fr;
+  .hero {
+    min-height: 0;
+    padding: 38px 20px 138px;
+    align-items: flex-start;
+    background-color: #E8F0FE;
+    background-image:
+      linear-gradient(180deg, rgba(248, 251, 255, 0.46) 0, rgba(238, 246, 255, 0.72) 180px, #E8F0FE 380px, #E8F0FE 100%),
+      url('../assets/hero-consulting.png');
+    background-position: center top, 58% top;
+    background-size: 100% 100%, auto 560px;
+    background-repeat: no-repeat;
   }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 88% 22%, rgba(96, 165, 250, 0.18) 0 56px, transparent 57px),
+      radial-gradient(circle at 8% 48%, rgba(30, 80, 255, 0.1) 0 72px, transparent 73px);
+  }
+
+  .hero-inner {
+    width: 100%;
+    margin: 0;
+  }
+
+  .hero-left {
+    width: 100%;
+    max-width: none;
+    gap: 14px;
+  }
+
+  .hero-title {
+    font-size: clamp(34px, 9vw, 40px);
+    line-height: 1.22;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
 }
 
 .hero-benefit-card {
@@ -651,12 +694,102 @@ body {
 }
 
 @media (max-width: 760px) {
+  .hero-benefit-eyebrow {
+    padding: 4px 10px;
+  }
+
+  .hero-benefit-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .hero-benefit-card {
+    min-height: 0;
+    padding: 18px;
+    grid-template-rows: auto 1px auto 1px auto;
+    border-radius: 18px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  }
+
+  .hero-benefit-card.primary {
+    background: #07154B;
+    border-color: #07154B;
+    box-shadow: 0 10px 22px rgba(7, 21, 75, 0.26);
+  }
+
+  .hero-benefit-card.primary .hero-benefit-name,
+  .hero-benefit-card.primary .hero-benefit-core {
+    color: var(--white);
+  }
+
+  .hero-benefit-card.primary .hero-benefit-divider {
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .hero-benefit-card.primary .hero-benefit-type,
+  .hero-benefit-card.primary .hero-benefit-hint {
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .hero-benefit-name {
+    font-size: 17px;
+  }
+
+  .hero-benefit-divider {
+    margin: 10px 0;
+  }
+
   .hero-benefit-core {
-    font-size: 28px;
+    min-height: 48px;
+    font-size: 22px;
+    line-height: 1.25;
+  }
+
+  .hero-benefit-core strong {
+    white-space: nowrap;
+  }
+
+  .hero-benefit-card:nth-child(2) .hero-benefit-core {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    font-size: 20px;
+  }
+
+  .hero-benefit-prefix,
+  .hero-benefit-unit {
+    font-size: 19px;
+    vertical-align: baseline;
+  }
+
+  .hero-benefit-number {
+    margin-left: 4px;
+    font-size: 38px;
+    letter-spacing: -1.4px;
+    line-height: 1;
+  }
+
+  .hero-benefit-unit {
+    margin-left: 2px;
+  }
+
+  .hero-benefit-type {
+    font-size: 12px;
+  }
+
+  .hero-benefit-hint {
+    font-size: 12px;
+  }
+
+  .hero-cta-question {
+    margin-top: 12px;
   }
 
   .hero .hero-actions {
     width: 100%;
+    margin-top: 6px;
     flex-direction: column;
     align-items: stretch;
   }
@@ -665,6 +798,11 @@ body {
   .hero .hero-detail-cta {
     width: 100%;
     justify-content: center;
+  }
+
+  .hero-benefit-note {
+    margin-top: 10px;
+    font-size: 12px;
   }
 }
 

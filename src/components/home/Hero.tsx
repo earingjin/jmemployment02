@@ -3,6 +3,12 @@ import benefitVideo from '../../assets/국취신청.mp4';
 import { AutoplayVideo } from '../common/AutoplayVideo';
 import { BENEFIT_GROUPS } from '../../data/programs';
 
+const renderBenefitHeadline = (headline: string) => {
+  const match = headline.match(/^(최대 )([\d,]+)(만원)$/);
+  if (!match) return headline;
+  return <><span className="hero-benefit-prefix">{match[1]}</span><span className="hero-benefit-number">{match[2]}</span><span className="hero-benefit-unit">{match[3]}</span></>;
+};
+
 // Hero: 배경 이미지 + 좌측 문구/CTA
 // 국민취업지원제도 수당(Ⅰ유형/Ⅱ유형/취업성공수당)을 최우선으로 노출한다. 데이터는 BenefitSection·상세 페이지와 동일한
 // BENEFIT_GROUPS(src/data/programs.ts)를 그대로 재사용하며, 여기서 새로 금액을 만들거나 합산하지 않는다.
@@ -35,7 +41,7 @@ export function Hero({ onConsult, onBranch, onDetail }: {
                 </div>
                 <div className="hero-benefit-divider" />
                 <div className="hero-benefit-core">
-                  {group.headline ? <strong>{group.headline}</strong> : group.sub?.split(' · ').map((item, index) => (
+                  {group.headline ? <strong>{renderBenefitHeadline(group.headline)}</strong> : group.sub?.split(' · ').map((item, index) => (
                     <strong key={item}>{index === 0 ? item : `+ ${item}`}</strong>
                   ))}
                 </div>
