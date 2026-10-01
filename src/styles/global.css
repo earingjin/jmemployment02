@@ -11,8 +11,8 @@
 }
 
 @font-face {
-  font-family: 'BM Jua';
-  src: url('/fonts/BMJUA.woff2') format('woff2');
+  font-family: 'Nanum Gothic';
+  src: url('/fonts/NanumGothic.woff2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -20,7 +20,7 @@
 
 :root {
   --font-heading: 'BM Hanna Pro', 'Noto Sans KR', sans-serif;
-  --font-body: 'BM Jua', 'Noto Sans KR', sans-serif;
+  --font-body: 'Nanum Gothic', 'Noto Sans KR', sans-serif;
   /* Vibrant Royal / Cobalt Blue Palette from Uploaded Image */
   --royal-main: #1E50FF;
   --royal-vibrant: #1742DE;
