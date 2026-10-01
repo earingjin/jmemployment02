@@ -11,16 +11,16 @@
 }
 
 @font-face {
-  font-family: 'SUIT';
-  src: url('/fonts/SUIT-Regular.woff2') format('woff2');
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-Regular.woff2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'SUIT';
-  src: url('/fonts/SUIT-SemiBold.woff2') format('woff2');
+  font-family: 'Pretendard';
+  src: url('/fonts/Pretendard-SemiBold.woff2') format('woff2');
   font-style: normal;
   font-weight: 600;
   font-display: swap;
@@ -28,8 +28,8 @@
 
 :root {
   --font-heading: 'Gmarket Sans', 'Noto Sans KR', sans-serif;
-  --font-body: 'SUIT', 'Noto Sans KR', sans-serif;
-  --font-ui: 'SUIT', 'Noto Sans KR', sans-serif;
+  --font-body: 'Pretendard', 'Noto Sans KR', sans-serif;
+  --font-ui: 'Pretendard', 'Noto Sans KR', sans-serif;
   /* Vibrant Royal / Cobalt Blue Palette from Uploaded Image */
   --royal-main: #1E50FF;
   --royal-vibrant: #1742DE;
@@ -116,6 +116,7 @@ h3,
 .ep-card .ep-amount,
 .pm-sum-big {
   font-family: var(--font-heading);
+  letter-spacing: -0.1em;
 }
 
 /* ========================================================
@@ -484,7 +485,9 @@ h3,
 
 /* 상담 이미지를 히어로 전체 배경으로 사용 */
 .hero {
-  background: url('../assets/hero-consulting.png') center center / cover no-repeat;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.56) 0%, rgba(248, 251, 255, 0.52) 38%, rgba(248, 251, 255, 0.36) 54%, rgba(248, 251, 255, 0.08) 72%, rgba(248, 251, 255, 0) 88%),
+    url('../assets/hero-consulting.png') center center / cover no-repeat;
   background-position: center top;
   /* 수당 카드가 추가되며 좌측 콘텐츠가 길어져 고정 height 대신 min-height로 전환(내용이 넘치면 배경도 함께 늘어남) */
   min-height: clamp(640px, 45vw, 830px);
@@ -670,14 +673,14 @@ h3,
 }
 
 .hero-benefit-type {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--slate-500);
   line-height: 1.35;
 }
 
 .hero-benefit-hint {
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 400;
   color: var(--slate-500);
   line-height: 1.4;
@@ -1252,24 +1255,6 @@ h3,
   justify-content: center;
 }
 
-/* Checklist in Card 4 */
-.bento-card.peach .bento-checklist {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 16px 0 20px 0;
-}
-
-.bento-card.peach .bento-checklist li {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--slate-700);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .bento-card.peach .btn-peach-cta {
   background: var(--royal-main);
   color: var(--white);
@@ -1311,8 +1296,6 @@ h3,
 .bento-info .amount, .bento-card.yellow .bento-info .amount { color: var(--royal-main); font-size: 21px; letter-spacing: -0.7px; line-height: 1.35; }
 .bento-info .desc, .bento-card.yellow .bento-info .desc { color: var(--slate-500); font-size: 13px; line-height: 1.55; margin-top: 8px; }
 .bento-card.peach > div:last-child { margin-top: auto; }
-.bento-card.peach .bento-checklist { margin: 0 0 13px; }
-.bento-card.peach .bento-checklist li { color: var(--slate-500); font-size: 13px; line-height: 1.55; }
 .bento-card.peach .btn-peach-cta { padding: 8px 13px; font-size: 12px; box-shadow: none; }
 
 .sec-products-wrap {
@@ -2906,17 +2889,19 @@ footer {
    카드 스타일의 단일 기준. 이전에는 이 블록(!important) + ProgramSection 인라인 스타일로 이중 정의되어 있었다.
    파일 맨 끝에 있고 선택자 명시도(.sec-bento ...)가 기본 .bento-* 규칙 이상이므로 !important 없이 동일하게 적용된다. */
   .sec-bento .bento-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-  .sec-bento .bento-card { min-height: 230px; padding: 23px; background: #fff; border-color: #dce5f1; box-shadow: none; }
+  .sec-bento .bento-card { display: grid; grid-template-rows: 72px minmax(0, 1fr); min-height: 270px; padding: 23px; background: #fff; border-color: #dce5f1; box-shadow: none; }
   .sec-bento .bento-card.yellow { background: #fff; border-color: #dce5f1; }
   .sec-bento .bento-card .bento-art, .sec-bento .bento-card .bento-badge { display: none; }
-  .sec-bento .bento-card .bento-top { margin-bottom: 0; }
-  .sec-bento .bento-card .bento-body { display: block; margin-top: auto; }
-  .sec-bento .bento-card h3, .sec-bento .bento-card.yellow h3 { color: #0a1e7a; font-size: 20px; line-height: 1.35; }
-  .sec-bento .bento-card .amount, .sec-bento .bento-card.yellow .amount { color: #1e50ff; font-size: 21px; line-height: 1.35; }
-  .sec-bento .bento-card .desc, .sec-bento .bento-card.yellow .desc { color: #64748b; font-size: 13px; line-height: 1.55; }
-  .sec-bento .bento-card.peach .bento-checklist { margin: 0 0 13px; }
-  .sec-bento .bento-card.peach .bento-checklist li { color: #64748b; font-size: 13px; }
-  .sec-bento .bento-card.peach .btn-peach-cta { padding: 8px 13px; font-size: 12px; box-shadow: none; }
+  .sec-bento .bento-card .bento-top { display: grid; margin-bottom: 0; }
+  .sec-bento .bento-card .bento-title-group { display: grid; grid-template-rows: 18px minmax(54px, 1fr); }
+  .sec-bento .bento-card .bento-label { align-self: start; font-family: var(--font-ui); font-weight: 600; }
+  .sec-bento .bento-card h3, .sec-bento .bento-card.yellow h3 { align-self: start; color: #0a1e7a; font-family: var(--font-ui); font-size: 20px; font-weight: 600; line-height: 1.35; }
+  .sec-bento .bento-card .bento-body { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-width: 0; }
+  .sec-bento .bento-card .bento-info { display: grid; grid-template-rows: minmax(38px, auto) 36px minmax(42px, 1fr); min-width: 0; }
+  .sec-bento .bento-card .bento-support-label { align-self: start; color: #64748b; font-family: var(--font-body); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+  .sec-bento .bento-card .bento-amount-value { align-self: start; color: #1e50ff; display: block; font-family: var(--font-heading); font-size: 26px; line-height: 1.25; letter-spacing: -0.035em; white-space: nowrap; }
+  .sec-bento .bento-card .desc, .sec-bento .bento-card.yellow .desc { align-self: end; color: #64748b; font-family: var(--font-body); font-size: 13px; line-height: 1.55; }
+  .sec-bento .bento-card.peach .btn-peach-cta { align-self: start; margin-top: 8px; padding: 8px 13px; font-size: 12px; box-shadow: none; }
   @media (min-width: 761px) and (max-width: 1024px) {
     .sec-bento .bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .bd-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -2928,6 +2913,8 @@ footer {
   }
   @media (max-width: 760px) {
     .sec-bento .bento-grid { grid-template-columns: 1fr; }
+    .sec-bento .bento-card { min-height: 258px; }
+    .sec-bento .bento-card .bento-amount-value { font-size: 24px; }
     .bd-grid { grid-template-columns: 1fr; }
   }
 

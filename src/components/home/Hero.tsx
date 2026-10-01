@@ -41,7 +41,7 @@ export function Hero({ onConsult, onBranch, onDetail }: {
                 <div className="hero-benefit-divider" />
                 <div className="hero-benefit-core">
                   {group.headline ? <strong>{renderBenefitHeadline(group.headline)}</strong> : group.sub?.split(' · ').map((item, index) => (
-                    <strong key={item}>{index === 0 ? item : `+ ${item}`}</strong>
+                    <strong key={item}>{index === 0 ? `${item} +` : item}</strong>
                   ))}
                 </div>
                 <div className="hero-benefit-divider" />
@@ -53,7 +53,6 @@ export function Hero({ onConsult, onBranch, onDetail }: {
             ))}
           </div>
 
-          <p className="hero-cta-question">나도 지원금을 받을 수 있을까?</p>
           <div className="hero-actions">
             <button className="btn-pill-dark hero-consult-cta" onClick={onConsult}>
               무료 상담 신청하기 ↗
@@ -91,7 +90,7 @@ export function Hero({ onConsult, onBranch, onDetail }: {
               </div>
               <div className="hvc-sub-item">
                 <div className="label">2유형</div>
-                <div className="val">취업활동비용 (참여수당·참여장려수당)</div>
+                <div className="val">취업활동비용 (참여수당참여장려수당)</div>
               </div>
             </div>
             <div style={{ marginTop: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>

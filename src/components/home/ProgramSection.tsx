@@ -28,6 +28,16 @@ const ART: Record<Exclude<ProgramCardVariant, 'peach'>, ReactNode> = {
   )
 };
 
+const renderProgramAmount = (amount: string) => {
+  const match = amount.match(/^(.*?)(\d+(?:,\d+)?만원)$/);
+  if (!match) return <strong className="bento-amount-value">{amount}</strong>;
+
+  return <>
+    <span className="bento-support-label">{match[1].trim()}</span>
+    <strong className="bento-amount-value">{match[2]}</strong>
+  </>;
+};
+
 // 2026 핵심 취업지원 프로그램 카드 4종 (카드 클릭 → 사업 상세 페이지, 네 번째 카드의 버튼 → 기업 지원금)
 export function ProgramSection({ onProgram, onEmployer }: {
   onProgram: (programId: string) => void;
@@ -53,17 +63,16 @@ export function ProgramSection({ onProgram, onEmployer }: {
                 <span className="bento-badge">{card.hiddenBadge}</span>
               </div>
               {card.variant === 'peach' ? (
-                // 네 번째 카드는 원본의 체크리스트 + 버튼 구조를 유지
-                <div>
-                  <ul className="bento-checklist">
-                    <li>{card.description}</li>
-                  </ul>
-                  <button className="btn-peach-cta" onClick={e => { e.stopPropagation(); onEmployer(); }}>{card.amount}</button>
+                <div className="bento-body">
+                  <div className="bento-info">
+                    {renderProgramAmount(card.amount)}
+                    <div className="desc">{card.description}</div>
+                  </div>
                 </div>
               ) : (
                 <div className="bento-body">
                   <div className="bento-info">
-                    <div className="amount">{card.amount}</div>
+                    {renderProgramAmount(card.amount)}
                     <div className="desc">{card.description}</div>
                   </div>
                   <div className="bento-art">{ART[card.variant]}</div>
