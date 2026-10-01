@@ -58,12 +58,22 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
       // Start after the Hero CTA has scrolled above the viewport, never before it.
       setStickyConsultVisible(mobile.matches && heroRect.bottom <= 0 && footerRect.top >= window.innerHeight + 100);
     };
-    const observer = new IntersectionObserver(update, { rootMargin: '0px 0px 100px 0px' });
+    let frameId: number | null = null;
+    const observer = new IntersectionObserver(() => {
+      // Observe callbacks can run before layout settles after navigation.
+      // Defer the geometry check by one frame so the fixed CTA is updated reliably.
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(update);
+    }, { rootMargin: '0px 0px 100px 0px' });
     observer.observe(heroButton);
     observer.observe(footer);
     mobile.addEventListener('change', update);
     update();
-    return () => { observer.disconnect(); mobile.removeEventListener('change', update); };
+    return () => {
+      observer.disconnect();
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+      mobile.removeEventListener('change', update);
+    };
   }, [view, hidden]);
   const [bdRegion, setBdRegion] = useState('전체');
   const [legalModal, setLegalModal] = useState<LegalContentId | null>(null);
