@@ -3,24 +3,33 @@
  * 1단계(구조 이관)에서는 선택자·값을 변경하지 않는다. 변경점은 이미지 경로(src/assets → ../assets)뿐이다.
  */
 @font-face {
-  font-family: 'BM Hanna Pro';
-  src: url('/fonts/BMHANNAPro.woff2') format('woff2');
+  font-family: 'Gmarket Sans';
+  src: url('/fonts/GmarketSansBold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SUIT';
+  src: url('/fonts/SUIT-Regular.woff2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Nanum Gothic';
-  src: url('/fonts/NanumGothic.woff2') format('woff2');
+  font-family: 'SUIT';
+  src: url('/fonts/SUIT-SemiBold.woff2') format('woff2');
   font-style: normal;
-  font-weight: 400;
+  font-weight: 600;
   font-display: swap;
 }
 
 :root {
-  --font-heading: 'BM Hanna Pro', 'Noto Sans KR', sans-serif;
-  --font-body: 'Nanum Gothic', 'Noto Sans KR', sans-serif;
+  --font-heading: 'Gmarket Sans', 'Noto Sans KR', sans-serif;
+  --font-body: 'SUIT', 'Noto Sans KR', sans-serif;
+  --font-ui: 'SUIT', 'Noto Sans KR', sans-serif;
   /* Vibrant Royal / Cobalt Blue Palette from Uploaded Image */
   --royal-main: #1E50FF;
   --royal-vibrant: #1742DE;
@@ -89,7 +98,11 @@ button,
 input,
 select,
 textarea {
-  font-family: inherit;
+  font-family: var(--font-body);
+}
+
+button {
+  font-family: var(--font-ui);
 }
 
 h1,
@@ -109,6 +122,7 @@ h3,
    HEADER & GNB (Crisp Royal Blue & Midnight)
 ======================================================== */
 .site-header {
+  font-family: var(--font-ui);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -264,6 +278,7 @@ h3,
 
 .mobile-menu-toggle,
 .mobile-menu-overlay {
+  font-family: var(--font-ui);
   display: none;
 }
 
@@ -545,19 +560,6 @@ h3,
    Hero 개편: 기존 BenefitSection의 BENEFIT_GROUPS 데이터를 그대로 사용하며
    카드 시각 언어(radius, border, 카드형 흰 배경)는 .benefit-type-card와 통일한다.
 ======================================================== */
-.hero-benefit-eyebrow {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--royal-main);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  background: rgba(255, 255, 255, 0.82);
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  width: fit-content;
-}
-
 /* Desktop/Tablet: 3열 가로 배치, 모바일 홈은 아래 전용 규칙에서 조정
    (1열 규칙은 기본 규칙보다 뒤에 있어야 적용되므로 바로 아래에 둔다) */
 .hero-benefit-grid {
@@ -733,10 +735,6 @@ h3,
 }
 
 @media (max-width: 760px) {
-  .hero-benefit-eyebrow {
-    padding: 4px 10px;
-  }
-
   .hero-benefit-grid {
     grid-template-columns: 1fr;
     gap: 12px;

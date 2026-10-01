@@ -23,7 +23,6 @@ export function Hero({ onConsult, onBranch, onDetail }: {
     <section className="hero" id="benefits">
       <div className="hero-inner">
         <div className="hero-left">
-          <span className="hero-benefit-eyebrow">국민취업지원제도</span>
           <h1 className="hero-title" id="pv-hero-headline">
             취업이 막막할 때<br />
             <span className="highlight">국민취업지원제도 상담부터</span>
