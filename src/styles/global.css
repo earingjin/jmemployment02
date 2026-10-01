@@ -2,7 +2,25 @@
  * 원본 index.html(현 index.legacy.html)의 <style> 블록 2개를 순서 그대로 옮긴 전역 CSS.
  * 1단계(구조 이관)에서는 선택자·값을 변경하지 않는다. 변경점은 이미지 경로(src/assets → ../assets)뿐이다.
  */
+@font-face {
+  font-family: 'BM Hanna Pro';
+  src: url('/fonts/BMHANNAPro.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BM Jua';
+  src: url('/fonts/BMJUA.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
+  --font-heading: 'BM Hanna Pro', 'Noto Sans KR', sans-serif;
+  --font-body: 'BM Jua', 'Noto Sans KR', sans-serif;
   /* Vibrant Royal / Cobalt Blue Palette from Uploaded Image */
   --royal-main: #1E50FF;
   --royal-vibrant: #1742DE;
@@ -59,11 +77,32 @@
 }
 
 body {
-  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
+  font-synthesis: none;
   background-color: var(--white);
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+.hero-benefit-name,
+.hero-benefit-core,
+.hero-benefit-number,
+.hvc-main-benefit .amount,
+.bento-info .amount,
+.ep-card .ep-amount,
+.pm-sum-big {
+  font-family: var(--font-heading);
 }
 
 /* ========================================================
@@ -2896,7 +2935,8 @@ footer {
 
 /* 모바일 홈 정보구조: 데스크톱과 상세 페이지에는 적용하지 않는다. */
 .mobile-home-summary,
-.mobile-home-services,
+.mobile-home-programs,
+.mobile-home-smartcare,
 .mobile-home-consult,
 .mobile-fixed-consult { display: none; }
 .page.sub-mode > .home-program-list { display: none; }
@@ -2912,6 +2952,7 @@ footer {
   .mobile-home > .home-program-list { display: none; }
   .mobile-home > .home-program-list.expanded { display: block; }
   .mobile-home .home-program-list .sec-bento { padding: 24px 20px 36px; }
+  .mobile-home .home-program-list .sec-header-center { display: none; }
 
   .mobile-home .hero { padding-bottom: 80px; }
   .mobile-home .hero-wave-wrap svg { height: 64px; }
@@ -2938,29 +2979,34 @@ footer {
   .mobile-home .hero .hero-detail-cta { padding: 13px 12px; color: #102779; }
 
   .mobile-home-summary,
-  .mobile-home-services,
+  .mobile-home-programs,
+  .mobile-home-smartcare,
   .mobile-home-consult { display: block; padding: 30px 20px; }
   .mobile-home-summary { background: #FFFFFF; }
-  .mobile-home-services { background: #F0F5FF; }
+  .mobile-home-programs { background: #F0F5FF; }
+  .mobile-home-smartcare { background: #FFFFFF; }
   .mobile-home-summary h2,
-  .mobile-home-services h2,
+  .mobile-home-programs h2,
+  .mobile-home-smartcare h2,
   .mobile-home-consult h2 { margin: 0 0 14px; color: #102779; font-size: 22px; line-height: 1.4; word-break: keep-all; }
-  .mobile-home-summary p { color: var(--text-secondary); font-size: 14px; line-height: 1.8; }
-  .mobile-home-summary button { margin-top: 16px; min-height: 44px; border: 0; background: transparent; color: #2455FF; font: inherit; font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
-  .mobile-home-service-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .mobile-home-service-grid button { min-width: 0; min-height: 108px; padding: 18px 12px; border: 1px solid #DCE5F1; border-radius: 16px; background: #FFFFFF; color: #102779; font: inherit; font-size: 16px; font-weight: 800; text-align: left; word-break: keep-all; box-shadow: 0 4px 12px rgba(16, 39, 121, .05); cursor: pointer; }
-  .mobile-home-service-grid span { display: block; margin-top: 9px; color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .mobile-home-summary p,
+  .mobile-home-programs p,
+  .mobile-home-smartcare p { color: var(--text-secondary); font-size: 14px; line-height: 1.8; }
+  .mobile-home-summary button,
+  .mobile-home-programs button,
+  .mobile-home-smartcare button { margin-top: 16px; min-height: 44px; border: 0; background: transparent; color: #2455FF; font: inherit; font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
   .mobile-home-consult { text-align: center; background: #E8F0FE; }
   .mobile-home-consult h2 { font-size: 20px; }
+  .mobile-home-consult-actions,
+  .mobile-fixed-consult { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .mobile-home-consult button,
-  .mobile-fixed-consult button { min-height: 48px; padding: 12px 18px; border: 0; border-radius: 999px; background: #2455FF; color: #FFFFFF; font: inherit; font-weight: 800; cursor: pointer; }
-  .mobile-home-consult button { width: 100%; }
-  .mobile-fixed-consult { position: fixed; z-index: 90; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #DCE5F1; background: #FFFFFF; box-shadow: 0 -6px 22px rgba(16, 39, 121, .1); }
-  .mobile-fixed-consult p { min-width: 0; color: #334155; font-size: 12px; line-height: 1.5; }
-  .mobile-fixed-consult strong { display: block; color: #102779; font-size: 13px; }
-  .mobile-fixed-consult button { flex: 0 0 auto; font-size: 14px; }
+  .mobile-fixed-consult button { min-width: 0; min-height: 48px; padding: 12px 8px; border: 0; border-radius: 999px; background: #2455FF; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+  .mobile-home-consult button:last-child,
+  .mobile-fixed-consult button:last-child { border: 1px solid #93C5FD; background: #FFFFFF; color: #102779; }
+  .mobile-fixed-consult { position: fixed; z-index: 90; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #DCE5F1; background: #FFFFFF; box-shadow: 0 -6px 22px rgba(16, 39, 121, .1); }
   .mobile-home-summary button:focus-visible,
-  .mobile-home-service-grid button:focus-visible,
+  .mobile-home-programs button:focus-visible,
+  .mobile-home-smartcare button:focus-visible,
   .mobile-home-consult button:focus-visible,
   .mobile-fixed-consult button:focus-visible { outline: 3px solid #60A5FA; outline-offset: 3px; }
 }

@@ -135,14 +135,12 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
             <p>만 15~69세 구직자 중 유형별 요건을 충족한 분에게 취업지원서비스를 제공합니다. 소득·재산 등 요건에 따라 Ⅰ유형은 구직촉진수당, Ⅱ유형은 취업활동비용을 지원합니다.</p>
             <button type="button" onClick={() => navigate('employment-support')}>지원 대상 및 신청 절차 자세히 보기 →</button>
           </section>
-          <section className="mobile-home-services">
-            <h2>JM커리어 취업지원 서비스</h2>
-            <div className="mobile-home-service-grid">
-              <button type="button" onClick={goToConsult}>취업상담<span>무료 상담 신청 ↗</span></button>
-              <button type="button" aria-expanded={mobileProgramsOpen} aria-controls="home-program-list" onClick={() => setMobileProgramsOpen(open => !open)}>취업지원 프로그램<span>지원 제도 확인 {mobileProgramsOpen ? '−' : '+'}</span></button>
-              <button type="button" onClick={() => navigate('smartcare')}>SmartCare<span>취업 준비 서비스 →</span></button>
-              <button type="button" onClick={() => openBranchDirectory()}>전국 지사 안내<span>가까운 지사 찾기 →</span></button>
-            </div>
+          <section className="mobile-home-programs">
+            <h2>취업지원 프로그램</h2>
+            <p>구직자 유형과 희망 진로에 맞는 정부지원사업을 확인해 보세요.</p>
+            <button type="button" aria-expanded={mobileProgramsOpen} aria-controls="home-program-list" onClick={() => setMobileProgramsOpen(open => !open)}>
+              프로그램 {mobileProgramsOpen ? '접기' : '펼쳐 보기'} {mobileProgramsOpen ? '−' : '+'}
+            </button>
           </section>
         </>}
         <VideoGuide />
@@ -151,6 +149,11 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
         <div id="home-program-list" className={'home-program-list' + (mobileProgramsOpen ? ' expanded' : '')}>
           <ProgramSection onProgram={id => { if (isProgramView(id)) navigate(id); }} onEmployer={() => navigate('employer')} />
         </div>
+        {view === 'home' && <section className="mobile-home-smartcare">
+          <h2>SmartCare</h2>
+          <p>진단부터 서류 준비, 면접까지 취업 준비 과정을 지원합니다.</p>
+          <button type="button" onClick={() => navigate('smartcare')}>SmartCare 자세히 보기 →</button>
+        </section>}
         <SmartCareSection onDetail={() => navigate('smartcare')} />
         <ReviewsSection onOpenReview={index => setReviewModal({ open: true, index })} />
         <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={() => navigate('employer')} />
@@ -158,14 +161,17 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
         <ConsultationSection />
         {view === 'home' && <section className="mobile-home-consult">
           <h2>취업 준비, 혼자 고민하지 마세요.</h2>
-          <button type="button" onClick={goToConsult}>상담 신청하기 →</button>
+          <div className="mobile-home-consult-actions">
+            <button type="button" onClick={goToConsult}>상담 신청하기 ↗</button>
+            <button type="button" onClick={() => openBranchDirectory()}>전국 지사 안내 ↗</button>
+          </div>
         </section>}
       <Footer onLegal={setLegalModal} onAdmin={onShowAdmin} />
       </div>
 
-      {view === 'home' && stickyConsultVisible && <aside className="mobile-fixed-consult" aria-label="무료 상담 안내">
-        <p>지원 대상인지 궁금하다면?<strong>무료 상담으로 확인하세요</strong></p>
+      {view === 'home' && stickyConsultVisible && <aside className="mobile-fixed-consult" aria-label="빠른 메뉴">
         <button type="button" onClick={goToConsult}>상담 신청 ↗</button>
+        <button type="button" onClick={() => openBranchDirectory()}>전국 지사 ↗</button>
       </aside>}
 
       <LegalModal content={legalModal ? LEGAL_CONTENT[legalModal] : null} onClose={() => setLegalModal(null)} />
