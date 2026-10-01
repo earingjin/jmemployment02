@@ -23,8 +23,8 @@ export function Hero({ onConsult, onBranch, onDetail }: {
             <span className="highlight">국민취업지원제도 상담부터</span>
           </h1>
           <p className="hero-desc">
-            국민취업지원제도 최대 360만원 혜택받기<br />
-            취업지원금, 받을 수 있는지 지금 확인하세요
+            구직촉진수당 최대 360만 원, 취업성공수당 최대 150만 원<br />
+            내가 받을 수 있는 지원금, 상담을 통해 확인해 보세요.
           </p>
 
           <div className="hero-benefit-grid">
@@ -48,12 +48,12 @@ export function Hero({ onConsult, onBranch, onDetail }: {
             ))}
           </div>
 
+          <p className="hero-cta-question">나도 지원금을 받을 수 있을까?</p>
           <div className="hero-actions">
-            <button className="btn-pill-dark" onClick={onConsult}>
-              상담 신청하기
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+            <button className="btn-pill-dark hero-consult-cta" onClick={onConsult}>
+              무료 상담 신청하기 ↗
             </button>
-            <button className="btn-pill-outline" onClick={onDetail}>
+            <button className="btn-pill-outline hero-detail-cta" onClick={onDetail}>
               국민취업지원제도 자세히 보기 →
             </button>
           </div>

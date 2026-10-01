@@ -1,20 +1,12 @@
-import { ADMIN_BRANCHES, branchSuffix, type BranchMap } from '../../data/branches';
 import type { LegalContentId } from '../../data/legal';
 
-export function Footer({ branches, onBranch, onLegal, onAdmin }: {
-  branches: BranchMap;
-  onBranch: (region: string) => void;
+export function Footer({ onLegal, onAdmin }: {
   onLegal: (id: LegalContentId) => void;
   onAdmin: () => void;
 }) {
   return (
     <footer>
       <div className="footer-inner">
-        <div className="footer-label">전국 지사 바로가기</div>
-        <div className="branch-list" id="pv-footer-branch-list">
-          {ADMIN_BRANCHES.filter(n => n !== '본사' && branches[n] && branches[n].published).map(name =>
-            <span key={name} onClick={() => onBranch(branches[name].region)}>{name + branchSuffix(name)}</span>)}
-        </div>
         <div className="footer-bottom">
           <span id="pv-footer-phone">JMCAREER 고용서비스</span>
           <span>© JMCAREER. ALL RIGHTS RESERVED.</span>

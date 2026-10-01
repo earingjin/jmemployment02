@@ -114,7 +114,7 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
         <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={() => navigate('employer')} />
         <NewsSection onOpenPress={index => setPressModal({ open: true, index })} />
         <ConsultationSection />
-        <Footer branches={branches} onBranch={region => openBranchDirectory(region)} onLegal={setLegalModal} onAdmin={onShowAdmin} />
+      <Footer onLegal={setLegalModal} onAdmin={onShowAdmin} />
       </div>
 
       <LegalModal content={legalModal ? LEGAL_CONTENT[legalModal] : null} onClose={() => setLegalModal(null)} />
