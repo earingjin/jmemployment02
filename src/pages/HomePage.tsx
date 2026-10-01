@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DEFAULT_MAP_EMBED_URL, PUBLIC_BRANCH, branchSuffix, mapEmbedUrl, naverMapSearchUrl, type BranchMap } from '../data/branches';
 import { PRESS_NEWS, REVIEWS } from '../data/content';
 import { findProgram } from '../data/programs';
 import { ConsultationSection } from '../components/home/ConsultationSection';
-import { EthicsSection } from '../components/home/EthicsSection';
+import { openConsultationForm } from '../data/consultation';
+import { LEGAL_CONTENT, type LegalContentId } from '../data/legal';
+import { LegalModal } from '../components/modals/LegalModal';
 import { Hero } from '../components/home/Hero';
 import { NetworkSection } from '../components/home/NetworkSection';
 import { NewsSection } from '../components/home/NewsSection';
@@ -40,13 +42,13 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
 }) {
   const [view, setView] = useState<View>(currentView);
   const [bdRegion, setBdRegion] = useState('전체');
+  const [legalModal, setLegalModal] = useState<LegalContentId | null>(null);
   const [programModal, setProgramModal] = useState<{ open: boolean; programId: string | null; audience: Audience }>({ open: false, programId: null, audience: 'seeker' });
   const [reviewModal, setReviewModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
   const [pressModal, setPressModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
   const [mapModal, setMapModal] = useState<{ open: boolean; content: MapModalContent }>({
     open: false, content: { title: '위치 안내', address: '', embedUrl: DEFAULT_MAP_EMBED_URL, linkUrl: '#' }
   });
-  const contactRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onPopState = () => setView(currentView());
@@ -69,25 +71,14 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
     navigate('branch');
   };
 
-  const goToSection = (id: string) => {
-    pushPath('/');
-    setView('home');
-    setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
-  };
-
   const openProgramDetail = (programId: string, audience: Audience = 'seeker') => {
     if (!findProgram(programId)) return;
     setProgramModal({ open: true, programId, audience });
   };
   const closeProgramDetail = () => setProgramModal(m => ({ ...m, open: false }));
 
-  // 원본 goToConsult(): 프로그램 모달만 닫고(다른 모달은 유지) 홈으로 돌아간 뒤 상담 영역으로 스크롤
-  const goToConsult = () => {
-    closeProgramDetail();
-    pushPath('/');
-    setView('home');
-    setTimeout(() => contactRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 40);
-  };
+  // 원래 페이지와 모달 상태를 유지하며 상담 신청 폼을 새 탭에서 연다.
+  const goToConsult = openConsultationForm;
 
   const openBranchMap = (branchName: string) => {
     const name = branchName || PUBLIC_BRANCH;
@@ -122,11 +113,11 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
         <ReviewsSection onOpenReview={index => setReviewModal({ open: true, index })} />
         <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={() => navigate('employer')} />
         <NewsSection onOpenPress={index => setPressModal({ open: true, index })} />
-        <ConsultationSection branches={branches} sectionRef={contactRef} />
-        <EthicsSection />
-        <Footer branches={branches} onBranch={region => openBranchDirectory(region)} onEthics={() => goToSection('ethics')} onAdmin={onShowAdmin} />
+        <ConsultationSection />
+        <Footer branches={branches} onBranch={region => openBranchDirectory(region)} onLegal={setLegalModal} onAdmin={onShowAdmin} />
       </div>
 
+      <LegalModal content={legalModal ? LEGAL_CONTENT[legalModal] : null} onClose={() => setLegalModal(null)} />
       <ProgramModal open={programModal.open} programId={programModal.programId} audience={programModal.audience}
         onClose={closeProgramDetail} onOpenDetail={openProgramDetail} onConsult={goToConsult} />
       <ReviewModal open={reviewModal.open} review={reviewModal.index === null ? null : REVIEWS[reviewModal.index]}

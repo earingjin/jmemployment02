@@ -1507,6 +1507,16 @@ body {
   gap: 12px;
 }
 
+.contact-application { display: flex; flex-direction: column; justify-content: center; gap: 12px; min-width: 0; color: var(--white); }
+.contact-application h3 { font-size: 22px; font-weight: 800; }
+.contact-application p { font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+.contact-application .contact-application-note { font-size: 13px; color: rgba(255, 255, 255, 0.85); }
+.contact-application .btn-contact-submit { display: block; text-align: center; text-decoration: none; }
+.contact-application .btn-contact-submit:focus-visible { outline: 3px solid #BAE6FD; outline-offset: 4px; }
+@media (max-width: 640px) {
+  .sec-contact .contact-box { padding: 28px 20px; gap: 28px; }
+}
+
 .contact-form input,
 .contact-form select,
 .contact-form textarea {
@@ -1738,6 +1748,32 @@ body {
 .ethics-card span { color: var(--text-muted); font-size: 13px; }
 .footer-link-button { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
 .footer-link-button:hover { text-decoration: underline; }
+.footer-link-button:focus-visible { outline: 2px solid #60A5FA; outline-offset: 4px; }
+
+/* 푸터 법적·윤리 안내: 기존 모달 배경과 카드 스타일 재사용 */
+.course-modal.legal-modal {
+  padding: 0;
+  max-width: 680px;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.legal-modal-head { position: relative; padding: 24px 80px 24px 28px; border-bottom: 1px solid var(--slate-100); flex-shrink: 0; }
+.legal-modal-head h2 { margin: 0; font-size: 22px; line-height: 1.4; font-weight: 800; color: #0A1E7A; overflow-wrap: anywhere; }
+.legal-modal-head .close-btn { width: 44px; height: 44px; }
+.legal-modal-body { padding: 28px; overflow-y: auto; overscroll-behavior: contain; min-height: 0; }
+.legal-modal-section + .legal-modal-section { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--slate-100); }
+.legal-modal-section h3 { margin: 0 0 12px; font-size: 17px; color: #0A1E7A; }
+.legal-modal-section p { margin: 0; font-size: 14px; line-height: 1.8; color: var(--text-secondary); white-space: pre-wrap; overflow-wrap: anywhere; }
+.legal-modal :focus-visible { outline: 2px solid var(--royal-main); outline-offset: -2px; }
+@media (max-width: 480px) {
+  .legal-modal-head { padding: 22px 76px 22px 20px; }
+  .legal-modal-head h2 { font-size: 18px; }
+  .legal-modal-body { padding: 20px; }
+}
 
 .btn-contact-submit {
   background: var(--white);
@@ -2509,4 +2545,16 @@ footer {
   .sec-bento .bento-card.peach .bento-checklist { margin: 0 0 13px; }
   .sec-bento .bento-card.peach .bento-checklist li { color: #64748b; font-size: 13px; }
   .sec-bento .bento-card.peach .btn-peach-cta { padding: 8px 13px; font-size: 12px; box-shadow: none; }
-  @media (max-width: 760px) { .sec-bento .bento-grid { grid-template-columns: 1fr; } }
+  @media (min-width: 761px) and (max-width: 1024px) {
+    .sec-bento .bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bd-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 1024px) {
+    .bd-card { min-width: 0; }
+    .bd-card .bd-addr,
+    .bd-card .bd-phone { overflow-wrap: anywhere; }
+  }
+  @media (max-width: 760px) {
+    .sec-bento .bento-grid { grid-template-columns: 1fr; }
+    .bd-grid { grid-template-columns: 1fr; }
+  }

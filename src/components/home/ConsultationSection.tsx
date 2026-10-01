@@ -1,10 +1,9 @@
-import type { Ref } from 'react';
-import { ADMIN_BRANCHES, branchSuffix, type BranchMap } from '../../data/branches';
+import { CONSULTATION_FORM_URL } from '../../data/consultation';
 
-// 상담 신청 영역. 제출 대상이 확정되기 전까지 입력값은 전송·저장하지 않는다.
-export function ConsultationSection({ branches, sectionRef }: { branches: BranchMap; sectionRef: Ref<HTMLElement> }) {
+// 신청 정보 입력은 외부 구글 폼에서 진행한다.
+export function ConsultationSection() {
   return (
-    <section className="sec-contact" id="pv-contact-section" ref={sectionRef}>
+    <section className="sec-contact" id="pv-contact-section">
       <div className="contact-box">
         <div className="contact-info">
           <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#1E50FF', textTransform: 'uppercase' }}>FAST CONSULTATION</span>
@@ -17,17 +16,12 @@ export function ConsultationSection({ branches, sectionRef }: { branches: Branch
           </div>
         </div>
 
-        <form className="contact-form" onSubmit={event => event.preventDefault()}>
-          <input name="name" type="text" placeholder="이름" autoComplete="name" required />
-          <input name="phone" type="tel" placeholder="전화번호 (예: 010-1234-5678)" autoComplete="tel" required />
-          <select name="preferredRegion" id="pv-contact-branch-select" defaultValue="" aria-label="희망지역" required>
-            <option value="" disabled>희망지역을 선택해 주세요</option>
-            {ADMIN_BRANCHES.filter(n => n === '본사' || (branches[n] && branches[n].published)).map(name =>
-              <option key={name} value={name}>{name + branchSuffix(name)}</option>)}
-          </select>
-          <input name="participationPath" type="text" placeholder="참여경로" required />
-          <button className="btn-contact-submit" type="submit" disabled aria-disabled="true">상담 신청 준비 중</button>
-        </form>
+        <div className="contact-application">
+          <h3>상담 신청 안내</h3>
+          <p>아래 버튼을 눌러 구글 폼에서 이름, 연락처 등 신청 정보를 입력해 주세요.</p>
+          <p className="contact-application-note">신청서는 새 탭에서 열립니다.</p>
+          <a className="btn-contact-submit" href={CONSULTATION_FORM_URL} target="_blank" rel="noopener noreferrer">상담 신청하기 (새 탭)</a>
+        </div>
       </div>
     </section>
   );

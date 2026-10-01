@@ -1,9 +1,10 @@
 import { ADMIN_BRANCHES, branchSuffix, type BranchMap } from '../../data/branches';
+import type { LegalContentId } from '../../data/legal';
 
-export function Footer({ branches, onBranch, onEthics, onAdmin }: {
+export function Footer({ branches, onBranch, onLegal, onAdmin }: {
   branches: BranchMap;
   onBranch: (region: string) => void;
-  onEthics: () => void;
+  onLegal: (id: LegalContentId) => void;
   onAdmin: () => void;
 }) {
   return (
@@ -21,7 +22,7 @@ export function Footer({ branches, onBranch, onEthics, onAdmin }: {
         <div className="footer-legal">
           <div className="legal-links">
             {/* 원본의 공백·&nbsp; 구분자를 그대로 유지하기 위해 한 줄로 작성 */}
-            <span>이용약관</span> &nbsp;ㅣ&nbsp; <span>개인정보취급방침</span> &nbsp;ㅣ&nbsp; <span>이메일 무단수집거부</span> &nbsp;ㅣ&nbsp; <button className="footer-link-button" onClick={onEthics}>취업윤리경영 · 직업상담사 윤리</button> &nbsp;ㅣ&nbsp; <span className="footer-admin" onClick={onAdmin}>관리자 대시보드</span>
+            <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('terms')}>이용약관</button> &nbsp;ㅣ&nbsp; <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('privacy')}>개인정보취급방침</button> &nbsp;ㅣ&nbsp; <span>이메일 무단수집거부</span> &nbsp;ㅣ&nbsp; <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('ethics')}>취업윤리경영 · 직업상담사 윤리</button> &nbsp;ㅣ&nbsp; <span className="footer-admin" onClick={onAdmin}>관리자 대시보드</span>
           </div>
           <div className="company-info">
             본사 : 서울시 성동구 왕십리로 58 서울지식산업센터 포휴 808호(성수동1가) TEL. 02-2284-0077<br />

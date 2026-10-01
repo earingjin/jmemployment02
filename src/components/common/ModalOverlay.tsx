@@ -17,5 +17,5 @@ export function ModalOverlay({ id, className, open, onClose, children }: {
 
 // 모달 우상단 닫기 버튼 (지도·후기·스마트솔루션·보도자료 모달 공통)
 export function ModalCloseButton({ onClick }: { onClick: () => void }) {
-  return <button className="close-btn" style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={onClick}>✕</button>;
+  return <button type="button" className="close-btn" aria-label="팝업 닫기" style={{ position: 'absolute', top: '20px', right: '20px' }} onClick={onClick}>✕</button>;
 }
