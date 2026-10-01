@@ -20,7 +20,7 @@ export function Header({ view, onNavigate, onConsult }: {
     nav.scrollTo({ left: nav.scrollLeft + (a.left - n.left) - (nav.clientWidth - a.width) / 2, behavior: 'smooth' });
   }, [view]);
 
-  const menu = NAV_ITEMS.filter(item => item.view !== 'branch');
+  const menu = NAV_ITEMS.filter(item => item.view !== 'branch' && !item.hidden);
   const branch = NAV_ITEMS.find(item => item.view === 'branch');
 
   return (

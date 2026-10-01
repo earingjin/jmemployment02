@@ -24,12 +24,13 @@ export const viewFromPath = (pathname: string): View =>
   (Object.keys(VIEW_PATHS) as View[]).find(v => VIEW_PATHS[v] === pathname) ?? 'home';
 
 // Header GNB (순서 = 화면 표시 순서)
-export const NAV_ITEMS: { label: string; view: View }[] = [
-  { label: '홈', view: 'home' },
+export const NAV_ITEMS: { label: string; view: View; hidden?: boolean }[] = [
   { label: '국민취업지원제도', view: 'employment-support' },
   { label: '청년 일자리도약장려금', view: 'job-leap' },
   { label: '미래내일 일경험', view: 'future-experience' },
   { label: '시니어인턴십', view: 'field-training' },
-  { label: '기업 지원금', view: 'employer' },
+  { label: 'SmartCare', view: 'smartcare' },
+  // 기능과 URL은 유지하고, 현재는 헤더에서만 노출하지 않는다.
+  { label: '기업 지원금', view: 'employer', hidden: true },
   { label: '전국지사', view: 'branch' }
 ];

@@ -56,13 +56,14 @@ export type SmartSolutionKey = 'burkman' | 'coverletter' | 'interview' | 'aptitu
 
 export interface SmartSolution {
   key: SmartSolutionKey;
+  stage: string;
   title: string;
   card: { category: string; summary: string; feature: string };
   modal: { desc: string; list: string[] };
 }
 
 export const SMART_SOLUTIONS: SmartSolution[] = [
-  { key: 'burkman', title: "버크만 성격검사",
+  { key: 'burkman', stage: '진단', title: "버크만 성격검사",
     card: { category: "진단도구", summary: "빠르고 깊이있게 나만의 강점과 컬러풀한 행동 패턴을 분석합니다.", feature: "강점·직무적합도" },
     modal: {
       desc: "국제적으로 검증된 버크만 진단으로, 나도 몰랐던 강점과 행동 패턴을 정확히 짚어드립니다.",
@@ -72,7 +73,7 @@ export const SMART_SOLUTIONS: SmartSolution[] = [
         "관심 직무와의 적합도 연결",
         "진단 결과를 바탕으로 한 커리어 방향 제안"
       ] } },
-  { key: 'coverletter', title: "AI 자기소개서",
+  { key: 'coverletter', stage: '서류 준비', title: "AI 자기소개서",
     card: { category: "AI 서류완성", summary: "합격 빅데이터 기반 맞춤형 전략 첨삭 및 스토리라인을 완성합니다.", feature: "무제한 첨삭 연계" },
     modal: {
       desc: "JMCAREER AI는 실제 합격 빅데이터를 바탕으로 자기소개서를 전략적으로 완성합니다.",
@@ -82,7 +83,7 @@ export const SMART_SOLUTIONS: SmartSolution[] = [
         "문항별 강점 도출 및 스토리라인 구성",
         "상담사와 함께하는 무제한 첨삭 연계"
       ] } },
-  { key: 'interview', title: "AI 실전면접",
+  { key: 'interview', stage: '면접 준비', title: "AI 실전면접",
     card: { category: "AI 실전면접", summary: "1분 자기소개, 텍스트면접, AI 휴먼면접으로 실전과 동일한 환경을 연습합니다.", feature: "실전 답변 피드백" },
     modal: {
       desc: "1분 자기소개, 텍스트기반면접, AI휴먼면접 등 다양한 모드에서 실전과 동일한 면접을 준비해드립니다.",
@@ -92,7 +93,7 @@ export const SMART_SOLUTIONS: SmartSolution[] = [
         "답변의 논리성·설득력 AI 분석",
         "상담사의 실제 면접관 시각 피드백 반영"
       ] } },
-  { key: 'aptitude', title: "AI NCS / 인적성검사",
+  { key: 'aptitude', stage: '역량 확인', title: "AI NCS / 인적성검사",
     card: { category: "인적성·NCS", summary: "NCS 문항 기반 기업별 출제 유형에 맞춰 모의고사를 직접 구성합니다.", feature: "약점 진단 & 보완" },
     modal: {
       desc: "방대한 NCS 문항을 바탕으로 각 기업별 출제 유형에 맞게 문항을 구성하고 커리어방향을 제시합니다.",

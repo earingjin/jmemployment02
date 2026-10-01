@@ -90,6 +90,7 @@ body {
 
 .nav-logo {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 10px;
   text-decoration: none;
@@ -116,14 +117,18 @@ body {
 
 .gnb {
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .gnb-programs {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex: 0 0 auto;
 }
 
 .gnb-item {
@@ -193,6 +198,7 @@ body {
 
 .nav-right {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 10px;
 }
@@ -1597,6 +1603,27 @@ body {
   margin-top: 32px;
 }
 
+.smart-care-summary {
+  max-width: var(--max-w);
+  margin: 38px auto 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  background: var(--white);
+  overflow: hidden;
+}
+
+.smart-care-step {
+  min-width: 0;
+  padding: 27px 24px;
+  border-right: 1px solid var(--slate-200);
+}
+
+.smart-care-step:last-child { border-right: 0; }
+.smart-care-step-stage { color: var(--royal-main); font-size: 13px; font-weight: 800; }
+.smart-care-step h3 { margin: 10px 0 0; color: #0A1E7A; font-size: 19px; line-height: 1.4; }
+
 .smart-care-page {
   display: block;
   max-width: var(--max-w);
@@ -1610,6 +1637,21 @@ body {
   gap: 12px;
   margin-top: 24px;
 }
+
+.smart-care-detail-list { max-width: 980px; margin: 40px auto 0; }
+.smart-care-detail-item {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.8fr) minmax(0, 1.6fr);
+  gap: 38px;
+  padding: 34px 0;
+  border-top: 1px solid var(--slate-200);
+}
+.smart-care-detail-item:last-child { border-bottom: 1px solid var(--slate-200); }
+.smart-care-detail-number { display: block; color: var(--royal-main); font-size: 14px; font-weight: 800; margin-bottom: 13px; }
+.smart-care-detail-stage { color: var(--slate-500); font-size: 14px; font-weight: 700; }
+.smart-care-detail-heading h2 { color: #0A1E7A; font-size: 24px; line-height: 1.35; margin: 8px 0 0; }
+.smart-care-detail-content p { color: var(--text-secondary); line-height: 1.7; margin: 0; }
+.smart-care-detail-content ul { margin: 18px 0 0; padding-left: 20px; color: var(--text-secondary); line-height: 1.8; }
 
 /* 밝은 배경에서 보조 버튼이 보이도록 Hero의 outline 버튼 색 재사용 */
 .smart-care-page .btn-pill-outline {
@@ -2400,6 +2442,9 @@ footer {
   .product-cards-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .smart-care-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .smart-care-step:nth-child(2) { border-right: 0; }
+  .smart-care-step:nth-child(-n+2) { border-bottom: 1px solid var(--slate-200); }
   .three-cards-grid {
     grid-template-columns: 1fr;
   }
@@ -2440,6 +2485,13 @@ footer {
     align-items: stretch;
     flex-direction: column;
   }
+  .smart-care-detail-item { grid-template-columns: 1fr; gap: 16px; }
+}
+
+@media (max-width: 480px) {
+  .smart-care-step { padding: 19px 16px; }
+  .smart-care-step h3 { font-size: 16px; }
+  .smart-care-page .bd-hero h1 { font-size: 30px; }
 }
 
 /* ===== 홈 사업 카드(ProgramSection) 최종 스타일 — 원본 두 번째 style 블록 =====
