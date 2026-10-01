@@ -519,7 +519,7 @@ body {
   width: fit-content;
 }
 
-/* Desktop/Tablet: 3열 가로 배치, Mobile(760px 이하): 1열
+/* Desktop/Tablet: 3열 가로 배치, 모바일 홈은 아래 전용 규칙에서 조정
    (1열 규칙은 기본 규칙보다 뒤에 있어야 적용되므로 바로 아래에 둔다) */
 .hero-benefit-grid {
   display: grid;
@@ -2893,3 +2893,74 @@ footer {
     .sec-bento .bento-grid { grid-template-columns: 1fr; }
     .bd-grid { grid-template-columns: 1fr; }
   }
+
+/* 모바일 홈 정보구조: 데스크톱과 상세 페이지에는 적용하지 않는다. */
+.mobile-home-summary,
+.mobile-home-services,
+.mobile-home-consult,
+.mobile-fixed-consult { display: none; }
+.page.sub-mode > .home-program-list { display: none; }
+
+@media (max-width: 760px) {
+  .mobile-home > .benefit-videos-section,
+  .mobile-home > .sec-products-wrap,
+  .mobile-home > .sec-reviews,
+  .mobile-home > .sec-three-cards,
+  .mobile-home > .sec-news,
+  .mobile-home > .sec-contact { display: none; }
+
+  .mobile-home > .home-program-list { display: none; }
+  .mobile-home > .home-program-list.expanded { display: block; }
+  .mobile-home .home-program-list .sec-bento { padding: 24px 20px 36px; }
+
+  .mobile-home .hero { padding-bottom: 80px; }
+  .mobile-home .hero-wave-wrap svg { height: 64px; }
+  .mobile-home .hero-wave-wrap::before { display: none; }
+  .mobile-home .hero-inner { margin: 0; min-width: 0; }
+  .mobile-home .hero-title { font-size: clamp(32px, 8.8vw, 38px); }
+  .mobile-home .hero-benefit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .mobile-home .hero-benefit-card { min-width: 0; padding: 14px 12px; gap: 8px; grid-template-rows: auto auto auto; }
+  .mobile-home .hero-benefit-card.primary { grid-column: 1 / -1; padding: 18px; background: #102779; border-color: #102779; }
+  .mobile-home .hero-benefit-divider { display: none; }
+  .mobile-home .hero-benefit-name { font-size: 16px; }
+  .mobile-home .hero-benefit-core { min-height: 0; justify-content: flex-start; }
+  .mobile-home .hero-benefit-card:nth-child(2) .hero-benefit-core { flex-direction: column; align-items: flex-start; font-size: 18px; gap: 3px; }
+  .mobile-home .hero-benefit-core strong { white-space: normal; word-break: keep-all; }
+  .mobile-home .hero-benefit-card:nth-child(2) .hero-benefit-core strong { white-space: nowrap; }
+  .mobile-home .hero-benefit-card:nth-child(3) .hero-benefit-core strong { display: flex; flex-wrap: wrap; align-items: baseline; }
+  .mobile-home .hero-benefit-card:nth-child(3) .hero-benefit-prefix { flex-basis: 100%; }
+  .mobile-home .hero-benefit-number { font-size: 36px; margin-left: 0; }
+  .mobile-home .hero-benefit-card.primary .hero-benefit-number { font-size: 44px; margin-left: 4px; }
+  .mobile-home .hero-benefit-unit { font-size: 16px; }
+  .mobile-home .hero-benefit-card.primary .hero-benefit-unit { font-size: 20px; }
+  .mobile-home .hero-benefit-type,
+  .mobile-home .hero-benefit-hint { overflow-wrap: anywhere; }
+  .mobile-home .hero .hero-detail-cta { padding: 13px 12px; color: #102779; }
+
+  .mobile-home-summary,
+  .mobile-home-services,
+  .mobile-home-consult { display: block; padding: 30px 20px; }
+  .mobile-home-summary { background: #FFFFFF; }
+  .mobile-home-services { background: #F0F5FF; }
+  .mobile-home-summary h2,
+  .mobile-home-services h2,
+  .mobile-home-consult h2 { margin: 0 0 14px; color: #102779; font-size: 22px; line-height: 1.4; word-break: keep-all; }
+  .mobile-home-summary p { color: var(--text-secondary); font-size: 14px; line-height: 1.8; }
+  .mobile-home-summary button { margin-top: 16px; min-height: 44px; border: 0; background: transparent; color: #2455FF; font: inherit; font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
+  .mobile-home-service-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .mobile-home-service-grid button { min-width: 0; min-height: 108px; padding: 18px 12px; border: 1px solid #DCE5F1; border-radius: 16px; background: #FFFFFF; color: #102779; font: inherit; font-size: 16px; font-weight: 800; text-align: left; word-break: keep-all; box-shadow: 0 4px 12px rgba(16, 39, 121, .05); cursor: pointer; }
+  .mobile-home-service-grid span { display: block; margin-top: 9px; color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .mobile-home-consult { text-align: center; background: #E8F0FE; }
+  .mobile-home-consult h2 { font-size: 20px; }
+  .mobile-home-consult button,
+  .mobile-fixed-consult button { min-height: 48px; padding: 12px 18px; border: 0; border-radius: 999px; background: #2455FF; color: #FFFFFF; font: inherit; font-weight: 800; cursor: pointer; }
+  .mobile-home-consult button { width: 100%; }
+  .mobile-fixed-consult { position: fixed; z-index: 90; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #DCE5F1; background: #FFFFFF; box-shadow: 0 -6px 22px rgba(16, 39, 121, .1); }
+  .mobile-fixed-consult p { min-width: 0; color: #334155; font-size: 12px; line-height: 1.5; }
+  .mobile-fixed-consult strong { display: block; color: #102779; font-size: 13px; }
+  .mobile-fixed-consult button { flex: 0 0 auto; font-size: 14px; }
+  .mobile-home-summary button:focus-visible,
+  .mobile-home-service-grid button:focus-visible,
+  .mobile-home-consult button:focus-visible,
+  .mobile-fixed-consult button:focus-visible { outline: 3px solid #60A5FA; outline-offset: 3px; }
+}

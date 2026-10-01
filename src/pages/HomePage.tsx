@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_MAP_EMBED_URL, PUBLIC_BRANCH, branchSuffix, mapEmbedUrl, naverMapSearchUrl, type BranchMap } from '../data/branches';
 import { PRESS_NEWS, REVIEWS } from '../data/content';
 import { findProgram } from '../data/programs';
@@ -41,6 +41,30 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
   onShowAdmin: () => void;
 }) {
   const [view, setView] = useState<View>(currentView);
+  const publicRef = useRef<HTMLDivElement>(null);
+  const [mobileProgramsOpen, setMobileProgramsOpen] = useState(false);
+  const [stickyConsultVisible, setStickyConsultVisible] = useState(false);
+
+  useEffect(() => {
+    if (view !== 'home' || hidden) { setStickyConsultVisible(false); return; }
+    const root = publicRef.current;
+    const heroButton = root?.querySelector('.hero-consult-cta');
+    const footer = root?.querySelector('footer');
+    if (!heroButton || !footer) return;
+    const mobile = window.matchMedia('(max-width: 760px)');
+    const update = () => {
+      const heroRect = heroButton.getBoundingClientRect();
+      const footerRect = footer.getBoundingClientRect();
+      // Start after the Hero CTA has scrolled above the viewport, never before it.
+      setStickyConsultVisible(mobile.matches && heroRect.bottom <= 0 && footerRect.top >= window.innerHeight + 100);
+    };
+    const observer = new IntersectionObserver(update, { rootMargin: '0px 0px 100px 0px' });
+    observer.observe(heroButton);
+    observer.observe(footer);
+    mobile.addEventListener('change', update);
+    update();
+    return () => { observer.disconnect(); mobile.removeEventListener('change', update); };
+  }, [view, hidden]);
   const [bdRegion, setBdRegion] = useState('전체');
   const [legalModal, setLegalModal] = useState<LegalContentId | null>(null);
   const [programModal, setProgramModal] = useState<{ open: boolean; programId: string | null; audience: Audience }>({ open: false, programId: null, audience: 'seeker' });
@@ -95,27 +119,54 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
   };
 
   return (
-    <div id="publicPage" style={hidden ? { display: 'none' } : undefined}>
+    <div id="publicPage" ref={publicRef} style={hidden ? { display: 'none' } : undefined}>
       <Header view={view} onNavigate={navigate} onConsult={goToConsult} />
 
-      <div className={'page' + (view !== 'home' ? ' sub-mode' : '')}>
+      <div className={'page' + (view !== 'home' ? ' sub-mode' : ' mobile-home')}>
         <EmployerView active={view === 'employer'} benefitYear={benefitYear} onDetail={id => openProgramDetail(id, 'employer')} onConsult={goToConsult} />
         <BranchDirectoryView active={view === 'branch'} branches={branches} region={bdRegion} onRegion={setBdRegion} onOpenMap={openBranchMap} />
         {view === 'smartcare' && <SmartCarePage onBack={goHome} onConsult={goToConsult} />}
         {isProgramView(view) && <ProgramDetailPage key={view} programId={view} onBack={goHome} onConsult={goToConsult} />}
 
         <Hero onConsult={goToConsult} onBranch={() => openBranchDirectory()} onDetail={() => navigate('employment-support')} />
+        {view === 'home' && <>
+          <section className="mobile-home-summary">
+            <h2>국민취업지원제도, 누가 받을 수 있나요?</h2>
+            <p>만 15~69세 구직자 중 유형별 요건을 충족한 분에게 취업지원서비스를 제공합니다. 소득·재산 등 요건에 따라 Ⅰ유형은 구직촉진수당, Ⅱ유형은 취업활동비용을 지원합니다.</p>
+            <button type="button" onClick={() => navigate('employment-support')}>지원 대상 및 신청 절차 자세히 보기 →</button>
+          </section>
+          <section className="mobile-home-services">
+            <h2>JM커리어 취업지원 서비스</h2>
+            <div className="mobile-home-service-grid">
+              <button type="button" onClick={goToConsult}>취업상담<span>무료 상담 신청 ↗</span></button>
+              <button type="button" aria-expanded={mobileProgramsOpen} aria-controls="home-program-list" onClick={() => setMobileProgramsOpen(open => !open)}>취업지원 프로그램<span>지원 제도 확인 {mobileProgramsOpen ? '−' : '+'}</span></button>
+              <button type="button" onClick={() => navigate('smartcare')}>SmartCare<span>취업 준비 서비스 →</span></button>
+              <button type="button" onClick={() => openBranchDirectory()}>전국 지사 안내<span>가까운 지사 찾기 →</span></button>
+            </div>
+          </section>
+        </>}
         <VideoGuide />
         {/* 기존 BenefitSection과 내용이 중복되어 Hero로 통합했다. 컴포넌트 파일은 삭제하지 않고 렌더링만 하지 않는다. */}
         {/* 사업 카드는 Header와 동일한 사업 상세 페이지로 이동한다 */}
-        <ProgramSection onProgram={id => { if (isProgramView(id)) navigate(id); }} onEmployer={() => navigate('employer')} />
+        <div id="home-program-list" className={'home-program-list' + (mobileProgramsOpen ? ' expanded' : '')}>
+          <ProgramSection onProgram={id => { if (isProgramView(id)) navigate(id); }} onEmployer={() => navigate('employer')} />
+        </div>
         <SmartCareSection onDetail={() => navigate('smartcare')} />
         <ReviewsSection onOpenReview={index => setReviewModal({ open: true, index })} />
         <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={() => navigate('employer')} />
         <NewsSection onOpenPress={index => setPressModal({ open: true, index })} />
         <ConsultationSection />
+        {view === 'home' && <section className="mobile-home-consult">
+          <h2>취업 준비, 혼자 고민하지 마세요.</h2>
+          <button type="button" onClick={goToConsult}>상담 신청하기 →</button>
+        </section>}
       <Footer onLegal={setLegalModal} onAdmin={onShowAdmin} />
       </div>
+
+      {view === 'home' && stickyConsultVisible && <aside className="mobile-fixed-consult" aria-label="무료 상담 안내">
+        <p>지원 대상인지 궁금하다면?<strong>무료 상담으로 확인하세요</strong></p>
+        <button type="button" onClick={goToConsult}>상담 신청 ↗</button>
+      </aside>}
 
       <LegalModal content={legalModal ? LEGAL_CONTENT[legalModal] : null} onClose={() => setLegalModal(null)} />
       <ProgramModal open={programModal.open} programId={programModal.programId} audience={programModal.audience}
