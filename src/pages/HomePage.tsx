@@ -12,7 +12,7 @@ import { NewsSection } from '../components/home/NewsSection';
 import { ProgramSection } from '../components/home/ProgramSection';
 import { ReviewsSection } from '../components/home/ReviewsSection';
 import { SmartCareSection } from '../components/home/SmartCareSection';
-import { VideoGuide } from '../components/home/VideoGuide';
+import { MobileVideoGuide, VideoGuide } from '../components/home/VideoGuide';
 import { Footer } from '../components/layout/Footer';
 import { Header } from '../components/layout/Header';
 import { MapModal, type MapModalContent } from '../components/modals/MapModal';
@@ -144,6 +144,7 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
             <h2>국민취업지원제도, 누가 받을 수 있나요?</h2>
             <p>만 15~69세 구직자 중 유형별 요건을 충족한 분에게 취업지원서비스를 제공합니다. 소득·재산 등 요건에 따라 Ⅰ유형은 구직촉진수당, Ⅱ유형은 취업활동비용을 지원합니다.</p>
             <button type="button" onClick={() => navigate('employment-support')}>지원 대상 및 신청 절차 자세히 보기 →</button>
+            <MobileVideoGuide />
           </section>
           <section className="mobile-home-programs">
             <h2>취업지원 프로그램</h2>

@@ -485,10 +485,13 @@ h3,
 
 /* 상담 이미지를 히어로 전체 배경으로 사용 */
 .hero {
-  background:
+  background-color: #F8FBFF;
+  background-image:
     linear-gradient(90deg, rgba(255, 255, 255, 0.56) 0%, rgba(248, 251, 255, 0.52) 38%, rgba(248, 251, 255, 0.36) 54%, rgba(248, 251, 255, 0.08) 72%, rgba(248, 251, 255, 0) 88%),
-    url('../assets/hero-consulting.png') center center / cover no-repeat;
-  background-position: center top;
+    url('../assets/hero-consulting.png');
+  background-position: center top, right top;
+  background-size: 100% 100%, auto 100%;
+  background-repeat: no-repeat;
   /* 수당 카드가 추가되며 좌측 콘텐츠가 길어져 고정 height 대신 min-height로 전환(내용이 넘치면 배경도 함께 늘어남) */
   min-height: clamp(640px, 45vw, 830px);
   /* 하단 곡선 장식(.hero-wave-wrap, 138px)이 콘텐츠와 겹치지 않도록 여백 확보 */
@@ -549,6 +552,33 @@ h3,
   }
 }
 
+@media (min-width: 1441px) {
+  .hero-left {
+    /* Keep desktop sizes through 1440px; grow together with room for the photo. */
+    max-width: clamp(610px, calc(20.833333vw + 310px), 940px);
+    --hero-title-size: clamp(52px, calc(1.666667vw + 28px), 76px);
+    --hero-desc-size: clamp(17px, calc(0.416667vw + 11px), 22px);
+    --hero-card-height: clamp(230px, calc(6.25vw + 140px), 300px);
+    --hero-card-padding: clamp(18px, calc(0.625vw + 9px), 25px);
+    --hero-card-name-size: clamp(16.5px, calc(0.3125vw + 12px), 20px);
+    --hero-card-core-size: clamp(26px, calc(0.625vw + 17px), 33px);
+    --hero-card-detail-size: clamp(13px, calc(0.178571vw + 10.428576px), 15px);
+    --hero-card-gap: clamp(10px, calc(0.535714vw + 2.285718px), 16px);
+    --hero-cta-size: clamp(15px, calc(0.178571vw + 12.428576px), 17px);
+    --hero-cta-height: clamp(52px, calc(0.714286vw + 41.714282px), 60px);
+    --hero-cta-space: clamp(0px, calc(0.357143vw - 5.14286px), 4px);
+  }
+
+  .hero-title {
+    font-size: var(--hero-title-size);
+  }
+
+  .hero-desc {
+    max-width: clamp(540px, calc(20.833333vw + 240px), 870px);
+    font-size: var(--hero-desc-size);
+  }
+}
+
 @media (max-width: 760px) {
   .hero {
     height: auto;
@@ -568,7 +598,7 @@ h3,
 .hero-benefit-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: var(--hero-card-gap, 10px);
   margin-top: 22px;
   /* 1024px 이하에서 .hero-left가 align-items: flex-start라 폭이 줄어들지 않도록 컬럼 폭을 채운다 */
   align-self: stretch;
@@ -627,8 +657,8 @@ h3,
   background: var(--white);
   border: 1px solid #DCE5F1;
   border-radius: var(--radius-lg);
-  min-height: 230px;
-  padding: 18px;
+  min-height: var(--hero-card-height, 230px);
+  padding: var(--hero-card-padding, 18px);
   box-shadow: var(--shadow-card);
   display: grid;
   grid-template-rows: auto 1px minmax(82px, 1fr) 1px auto;
@@ -643,7 +673,7 @@ h3,
 
 .hero-benefit-name {
   display: block;
-  font-size: 16.5px;
+  font-size: var(--hero-card-name-size, 16.5px);
   font-weight: 800;
   color: #0A1E7A;
   line-height: 1.3;
@@ -660,7 +690,7 @@ h3,
   flex-direction: column;
   justify-content: center;
   color: #0A1E7A;
-  font-size: 26px;
+  font-size: var(--hero-card-core-size, 26px);
   font-weight: 900;
   letter-spacing: -0.6px;
   line-height: 1.23;
@@ -673,14 +703,14 @@ h3,
 }
 
 .hero-benefit-type {
-  font-size: 13px;
+  font-size: var(--hero-card-detail-size, 13px);
   font-weight: 600;
   color: var(--slate-500);
   line-height: 1.35;
 }
 
 .hero-benefit-hint {
-  font-size: 13px;
+  font-size: var(--hero-card-detail-size, 13px);
   font-weight: 400;
   color: var(--slate-500);
   line-height: 1.4;
@@ -709,8 +739,9 @@ h3,
 }
 
 .hero .hero-consult-cta {
-  min-height: 52px;
-  padding: 14px 28px;
+  font-size: var(--hero-cta-size, 15px);
+  min-height: var(--hero-cta-height, 52px);
+  padding: calc(14px + var(--hero-cta-space, 0px)) calc(28px + var(--hero-cta-space, 0px));
   background: #2455FF;
   border-color: #2455FF;
   color: var(--white);
@@ -724,8 +755,9 @@ h3,
 }
 
 .hero .hero-detail-cta {
-  min-height: 52px;
-  padding: 13px 24px;
+  font-size: var(--hero-cta-size, 15px);
+  min-height: var(--hero-cta-height, 52px);
+  padding: calc(13px + var(--hero-cta-space, 0px)) calc(24px + var(--hero-cta-space, 0px));
   background: rgba(255, 255, 255, 0.9);
   border-color: #93C5FD;
   color: #1742DE;
@@ -2923,7 +2955,8 @@ footer {
 .mobile-home-programs,
 .mobile-home-smartcare,
 .mobile-home-consult,
-.mobile-fixed-consult { display: none; }
+.mobile-fixed-consult,
+.mobile-video-guide { display: none; }
 .page.sub-mode > .home-program-list { display: none; }
 
 @media (max-width: 760px) {
@@ -2980,6 +3013,15 @@ footer {
   .mobile-home-summary button,
   .mobile-home-programs button,
   .mobile-home-smartcare button { margin-top: 16px; min-height: 44px; border: 0; background: transparent; color: #2455FF; font: inherit; font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
+  .mobile-home-summary .mobile-video-guide { display: block; margin-top: 12px; padding-top: 12px; border-top: 1px solid #DCE5F1; }
+  .mobile-home-summary .mobile-video-guide-toggle { width: 100%; margin-top: 0; padding: 0; color: #2455FF; }
+  .mobile-video-guide-content { margin-top: 10px; }
+  .mobile-video-guide-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .mobile-home-summary .mobile-video-guide-list button { min-width: 0; min-height: 44px; margin-top: 0; padding: 10px 8px; border: 1px solid #C9D8F5; border-radius: 10px; background: #FFFFFF; color: #102779; font-size: 13px; font-weight: 600; line-height: 1.35; text-align: center; }
+  .mobile-home-summary .mobile-video-guide-list button.active { border-color: #2455FF; background: #E8F0FE; color: #1742DE; }
+  .mobile-video-guide-list button span { display: block; margin-bottom: 2px; color: #2455FF; font-size: 11px; }
+  .mobile-video-guide-player { margin-top: 10px; overflow: hidden; border-radius: 12px; background: #07154B; }
+  .mobile-video-guide-player video { display: block; width: 100%; aspect-ratio: 16 / 9; }
   .mobile-home-consult { text-align: center; background: #E8F0FE; }
   .mobile-home-consult h2 { font-size: 20px; }
   .mobile-home-consult-actions,
