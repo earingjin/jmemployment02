@@ -25,7 +25,7 @@ export function BranchDirectoryView({ active, branches, region, onRegion, onOpen
       </section>
       <div className="bd-tabs" id="bdTabs">
         {['전체', ...BRANCH_REGIONS].map(r => {
-          const cnt = r === '전체' ? all.length : all.filter(n => branches[n].region === r).length;
+          const cnt = r === '전체' ? branchCount : all.filter(n => branches[n].region === r).length;
           return <button key={`${region}-${r}`} className={'bd-tab' + (r === region ? ' active' : '')} onClick={() => onRegion(r)}>{r}<span className="cnt">{cnt}</span></button>;
         })}
       </div>
