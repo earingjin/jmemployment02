@@ -9,7 +9,6 @@ import { LegalModal } from '../components/modals/LegalModal';
 import { Hero } from '../components/home/Hero';
 import { NetworkSection } from '../components/home/NetworkSection';
 import { NewsSection } from '../components/home/NewsSection';
-import { ProgramSection } from '../components/home/ProgramSection';
 import { ReviewsSection } from '../components/home/ReviewsSection';
 import { SmartCareSection } from '../components/home/SmartCareSection';
 import { MobileVideoGuide, VideoGuide } from '../components/home/VideoGuide';
@@ -42,7 +41,6 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
 }) {
   const [view, setView] = useState<View>(currentView);
   const publicRef = useRef<HTMLDivElement>(null);
-  const [mobileProgramsOpen, setMobileProgramsOpen] = useState(false);
   const [stickyConsultVisible, setStickyConsultVisible] = useState(false);
 
   useEffect(() => {
@@ -146,20 +144,9 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
             <button type="button" onClick={() => navigate('employment-support')}>지원 대상 및 신청 절차 자세히 보기 →</button>
             <MobileVideoGuide />
           </section>
-          <section className="mobile-home-programs">
-            <h2>취업지원 프로그램</h2>
-            <p>구직자 유형과 희망 진로에 맞는 정부지원사업을 확인해 보세요.</p>
-            <button type="button" aria-expanded={mobileProgramsOpen} aria-controls="home-program-list" onClick={() => setMobileProgramsOpen(open => !open)}>
-              프로그램 {mobileProgramsOpen ? '접기' : '펼쳐 보기'} {mobileProgramsOpen ? '−' : '+'}
-            </button>
-          </section>
         </>}
         <VideoGuide />
         {/* 기존 BenefitSection과 내용이 중복되어 Hero로 통합했다. 컴포넌트 파일은 삭제하지 않고 렌더링만 하지 않는다. */}
-        {/* 사업 카드는 Header와 동일한 사업 상세 페이지로 이동한다 */}
-        <div id="home-program-list" className={'home-program-list' + (mobileProgramsOpen ? ' expanded' : '')}>
-          <ProgramSection onProgram={id => { if (isProgramView(id)) navigate(id); }} onEmployer={() => navigate('employer')} />
-        </div>
         {view === 'home' && <section className="mobile-home-smartcare">
           <h2>SmartCare</h2>
           <p>진단부터 서류 준비, 면접까지 취업 준비 과정을 지원합니다.</p>

@@ -81,6 +81,17 @@ export function ProgramSection({ onProgram, onEmployer }: {
             </div>
           ))}
         </div>
+
+        <div className="mobile-program-guide" aria-label="상황별 지원사업 안내">
+          <h3>상황별 지원사업 안내</h3>
+          <ol>
+            <li><span>만 15~69세 구직자, 저소득층, 고용보험 미가입자</span><strong>국민취업지원제도</strong></li>
+            <li><span>만 15~34세 청년을 정규직 채용하려는 기업</span><strong>청년일자리도약장려금</strong></li>
+            <li><span>실무 경력이 없어 경험이 필요한 미취업 청년</span><strong>미래내일 일경험</strong></li>
+            <li><span>만 60세 이상 구직자, 고령자를 채용하려는 기업</span><strong>시니어인턴십</strong></li>
+          </ol>
+          <p>세부 지원 요건과 신청 가능 여부는 상담 및 해당 사업의 공식 공고를 통해 확인해 주세요.</p>
+        </div>
       </div>
     </section>
   );

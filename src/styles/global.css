@@ -487,10 +487,10 @@ h3,
 .hero {
   background-color: #F8FBFF;
   background-image:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.56) 0%, rgba(248, 251, 255, 0.52) 38%, rgba(248, 251, 255, 0.36) 54%, rgba(248, 251, 255, 0.08) 72%, rgba(248, 251, 255, 0) 88%),
+    linear-gradient(90deg, #F8FBFF 0%, rgba(248, 251, 255, .92) 34%, rgba(248, 251, 255, .52) 56%, rgba(248, 251, 255, .12) 76%, rgba(248, 251, 255, 0) 100%),
     url('../assets/hero-consulting.png');
-  background-position: center top, right top;
-  background-size: 100% 100%, auto 100%;
+  background-position: center top, center center;
+  background-size: 100% 100%, cover;
   background-repeat: no-repeat;
   /* 수당 카드가 추가되며 좌측 콘텐츠가 길어져 고정 height 대신 min-height로 전환(내용이 넘치면 배경도 함께 늘어남) */
   min-height: clamp(640px, 45vw, 830px);
@@ -509,12 +509,12 @@ h3,
 }
 
 .hero-title {
-  color: #0A1E7A;
+  color: #142D66;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .hero-title span.highlight {
-  color: #1E50FF;
+  color: #3458B8;
 }
 
 .hero-desc {
@@ -525,8 +525,8 @@ h3,
 
 .hero .btn-pill-outline {
   background: transparent;
-  border-color: #1E50FF;
-  color: #0A1E7A;
+  border-color: #5274B8;
+  color: #142D66;
 }
 
 /* 히어로의 보조 배지 제거: 핵심 문구와 CTA에 집중 */
@@ -742,16 +742,16 @@ h3,
   font-size: var(--hero-cta-size, 15px);
   min-height: var(--hero-cta-height, 52px);
   padding: calc(14px + var(--hero-cta-space, 0px)) calc(28px + var(--hero-cta-space, 0px));
-  background: #2455FF;
-  border-color: #2455FF;
+  background: #3458B8;
+  border-color: #3458B8;
   color: var(--white);
-  box-shadow: 0 8px 20px rgba(36, 85, 255, 0.32);
+  box-shadow: 0 8px 20px rgba(52, 88, 184, 0.28);
 }
 
 .hero .hero-consult-cta:hover {
-  background: #1742DE;
-  border-color: #1742DE;
-  box-shadow: 0 10px 24px rgba(36, 85, 255, 0.4);
+  background: #28478F;
+  border-color: #28478F;
+  box-shadow: 0 10px 24px rgba(40, 71, 143, 0.32);
 }
 
 .hero .hero-detail-cta {
@@ -760,13 +760,13 @@ h3,
   padding: calc(13px + var(--hero-cta-space, 0px)) calc(24px + var(--hero-cta-space, 0px));
   background: rgba(255, 255, 255, 0.9);
   border-color: #93C5FD;
-  color: #1742DE;
+  color: #3458B8;
   box-shadow: none;
 }
 
 .hero .hero-detail-cta:hover {
   background: var(--white);
-  border-color: #2455FF;
+  border-color: #5274B8;
 }
 
 @media (max-width: 760px) {
@@ -927,11 +927,23 @@ h3,
 }
 
 /* HERO 바로 아래: 구직촉진수당 신청 영상 2종 */
-.benefit-videos-section { padding: 72px 28px 84px; background: #F8FAFF; }
+.benefit-videos-section {
+  padding: 72px 28px 84px;
+  /* Hero 곡선의 채움색에서 시작해 제목과 카드 영역까지 자연스럽게 밝아진다. */
+  background: linear-gradient(
+    180deg,
+    #0A2374 0,
+    #2555A8 14%,
+    #A9C7F0 35%,
+    #EEF4FC 56%,
+    #F8FAFF 76%,
+    #F8FAFF 100%
+  );
+}
 .benefit-videos-inner { max-width: var(--max-w); margin: 0 auto; }
 .benefit-videos-heading { text-align: center; margin-bottom: 32px; }
-.benefit-videos-heading .eyebrow { color: var(--royal-main); font-size: 12px; font-weight: 800; letter-spacing: .6px; }
-.benefit-videos-heading h2 { margin-top: 7px; color: #0A1E7A; font-size: 30px; font-weight: 900; letter-spacing: -1px; }
+.benefit-videos-section .benefit-videos-heading .eyebrow { color: #FFFFFF !important; font-size: 12px; font-weight: 800; letter-spacing: .6px; }
+.benefit-videos-section .benefit-videos-heading h2 { margin-top: 7px; color: #FFFFFF !important; font-size: 30px; font-weight: 900; letter-spacing: -1px; }
 .benefit-video-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .benefit-video-card { overflow: hidden; border: 1px solid #D8E4FF; border-radius: var(--radius-xl); background: var(--white); box-shadow: var(--shadow-card); }
 .benefit-video-card video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #07154B; }
@@ -1064,8 +1076,8 @@ h3,
 }
 
 .hero-wave-wrap path {
-  stroke: rgba(255, 255, 255, 0.98);
-  stroke-width: 3;
+  /* 흰 외곽선을 제거해 곡선과 이어지는 그라데이션 사이의 색상 단절을 막는다. */
+  stroke: none;
 }
 
 /* 다음 콘텐츠가 이어진다는 것을 알려주는 스크롤 힌트 */
@@ -1346,6 +1358,15 @@ h3,
   bottom: -54%;
   background: rgba(140, 194, 255, .11);
 }
+@media (min-width: 761px) {
+  .sec-bento {
+    background: linear-gradient(135deg, #f8fbff 0%, #edf6ff 48%, #e7f2ff 100%);
+  }
+  .sec-bento::before,
+  .sec-bento::after {
+    display: none;
+  }
+}
 .sec-bento-inner { position: relative; z-index: 1; }
 .sec-bento .sec-header-center { margin-bottom: 28px; }
 .sec-bento .sec-header-center h2 { font-size: 29px; margin-bottom: 7px; }
@@ -1369,6 +1390,12 @@ h3,
   position: relative;
   padding: 80px 28px;
 }
+
+.sec-products-wrap .ribbon-pill {
+  background: #3458B8;
+  box-shadow: 0 4px 14px rgba(52, 88, 184, .24);
+}
+.sec-products-wrap .sec-header-center h2 { color: #142D66; }
 
 .ribbon-badge-center {
   display: flex;
@@ -1764,70 +1791,92 @@ h3,
 .contact-box {
   max-width: var(--max-w);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, .9fr);
-  gap: clamp(48px, 9vw, 144px);
-  align-items: center;
+  display: block;
 }
-
-.contact-eyebrow {
-  display: inline-block;
-  color: #2452DE;
-  font-size: 12.5px;
+.contact-guidance {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(40px, 7vw, 108px);
+}
+.contact-guidance h2 {
+  margin: 0 0 18px;
+  color: #142D66;
+  font-size: clamp(26px, 2.2vw, 34px);
+  font-weight: 900;
+  line-height: 1.4;
+  letter-spacing: -.04em;
+}
+.contact-guidance p {
+  margin: 0;
+  color: #52627C;
+  font-size: 14px;
+  line-height: 1.75;
+}
+.contact-guidance-intro p + p { margin-top: 12px; }
+.contact-guidance-intro .btn-contact-submit {
+  display: block;
+  width: 100%;
+  margin-top: 28px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  text-align: center;
+  text-decoration: none;
+}
+.contact-program-guide ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: program-guide;
+}
+.contact-program-guide li {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 13px 0 13px 28px;
+  border-top: 1px solid #D8E2F0;
+  counter-increment: program-guide;
+}
+.contact-program-guide li::before {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  color: #3458B8;
+  content: counter(program-guide, decimal-leading-zero);
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: .04em;
-  text-transform: uppercase;
 }
-
-.contact-info h2 {
-  margin: 10px 0 14px;
-  color: #152C61;
-  font-size: clamp(30px, 2.7vw, 38px);
-  font-weight: 900;
-  line-height: 1.3;
-  letter-spacing: -0.8px;
-}
-.contact-info h2 span { color: #2452DE; }
-
-.contact-info p {
-  font-size: 15px;
-  color: #52627C;
-  line-height: 1.6;
-}
-.contact-benefits {
-  margin-top: 24px;
-  color: #52627C;
-  font-size: 13px;
-  line-height: 1.7;
-}
-
+.contact-program-guide li:last-child { border-bottom: 1px solid #D8E2F0; }
+.contact-program-guide li span { color: #52627C; font-size: 13px; line-height: 1.55; }
+.contact-program-guide li strong { color: #3458B8; font-size: 14px; line-height: 1.45; }
+.contact-program-guide-note { margin-top: 14px !important; color: #6B7A91 !important; font-size: 12px !important; line-height: 1.65 !important; }
 .contact-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.contact-application { display: flex; flex-direction: column; justify-content: center; gap: 12px; min-width: 0; color: #152C61; }
-.contact-application h3 { font-size: 22px; font-weight: 800; }
-.contact-application p { color: #52627C; font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
-.contact-application .contact-application-note { font-size: 13px; color: #52627C; }
-.contact-application .btn-contact-submit { display: block; text-align: center; text-decoration: none; }
 .sec-contact .btn-contact-submit {
   margin-top: 10px;
   padding: 14px 20px;
   border-radius: 12px;
-  background: #2452DE;
+  background: #3458B8;
   color: #FFFFFF;
-  box-shadow: 0 8px 18px rgba(36, 82, 222, .2);
+  box-shadow: 0 8px 18px rgba(52, 88, 184, .2);
 }
 .sec-contact .btn-contact-submit:hover {
-  background: #1c43bd;
-  box-shadow: 0 10px 22px rgba(36, 82, 222, .28);
+  background: #28478F;
+  box-shadow: 0 10px 22px rgba(40, 71, 143, .28);
 }
-.contact-application .btn-contact-submit:focus-visible { outline: 3px solid #2452DE; outline-offset: 4px; }
+.contact-guidance .contact-guidance-intro .btn-contact-submit {
+  margin-top: 28px;
+  padding: 18px 24px;
+  border-radius: 14px;
+}
+.contact-guidance-intro .btn-contact-submit:focus-visible { outline: 3px solid #5274B8; outline-offset: 4px; }
 @media (max-width: 1024px) {
   .sec-contact { padding: 80px 28px; }
-  .sec-contact .contact-box { grid-template-columns: 1fr; gap: 44px; }
+  .contact-guidance { grid-template-columns: 1fr; gap: 36px; }
 }
 @media (max-width: 640px) {
   .sec-contact { padding: 64px 20px; }
@@ -1940,7 +1989,7 @@ h3,
 }
 
 .smart-care-step {
-  --smart-care-accent: #2452DE;
+  --smart-care-accent: #3458B8;
   --smart-care-tint: #E8EFFF;
   min-width: 0;
   min-height: 176px;
@@ -1978,20 +2027,20 @@ h3,
   font-size: 13px;
   font-weight: 800;
 }
-.smart-care-step h3 { margin: 10px 0 0; color: #0A1E7A; font-size: 19px; line-height: 1.4; }
+.smart-care-step h3 { margin: 10px 0 0; color: #142D66; font-size: 19px; line-height: 1.4; }
 .sec-products-wrap .btn-pill-dark {
-  border-color: #2452DE;
+  border-color: #3458B8;
   border-radius: 12px;
-  background: #2452DE;
+  background: #3458B8;
   color: #FFFFFF;
-  box-shadow: 0 8px 18px rgba(36, 82, 222, .2);
+  box-shadow: 0 8px 18px rgba(52, 88, 184, .2);
 }
 .sec-products-wrap .btn-pill-dark:hover {
-  border-color: #1C43BD;
-  background: #1C43BD;
-  box-shadow: 0 10px 22px rgba(36, 82, 222, .28);
+  border-color: #28478F;
+  background: #28478F;
+  box-shadow: 0 10px 22px rgba(40, 71, 143, .28);
 }
-.sec-products-wrap .btn-pill-dark:focus-visible { outline: 3px solid #2452DE; outline-offset: 4px; }
+.sec-products-wrap .btn-pill-dark:focus-visible { outline: 3px solid #5274B8; outline-offset: 4px; }
 @media (prefers-reduced-motion: reduce) {
   .smart-care-step { transition: none; }
   .smart-care-step:hover { transform: none; }
@@ -3026,6 +3075,7 @@ footer {
    카드 스타일의 단일 기준. 이전에는 이 블록(!important) + ProgramSection 인라인 스타일로 이중 정의되어 있었다.
    파일 맨 끝에 있고 선택자 명시도(.sec-bento ...)가 기본 .bento-* 규칙 이상이므로 !important 없이 동일하게 적용된다. */
   .sec-bento .bento-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .sec-bento .sec-header-center h2 { color: #142D66; }
   .sec-bento .bento-card {
     display: grid;
     grid-template-rows: 72px minmax(0, 1fr);
@@ -3062,13 +3112,14 @@ footer {
   .sec-bento .bento-card.green .bento-label { color: #17845f; background: #e0f7ed; }
   .sec-bento .bento-card.yellow .bento-label { color: #7653c9; background: #f0eaff; }
   .sec-bento .bento-card.peach .bento-label { color: #c56829; background: #fff0e5; }
-  .sec-bento .bento-card h3, .sec-bento .bento-card.yellow h3 { align-self: start; color: #0a1e7a; font-family: var(--font-ui); font-size: 20px; font-weight: 600; line-height: 1.35; }
+  .sec-bento .bento-card h3, .sec-bento .bento-card.yellow h3 { align-self: start; color: #142D66; font-family: var(--font-ui); font-size: 20px; font-weight: 600; line-height: 1.35; }
   .sec-bento .bento-card .bento-body { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-width: 0; }
   .sec-bento .bento-card .bento-info { display: grid; grid-template-rows: minmax(38px, auto) 36px minmax(42px, 1fr); min-width: 0; }
   .sec-bento .bento-card .bento-support-label { align-self: start; color: #64748b; font-family: var(--font-body); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
-  .sec-bento .bento-card .bento-amount-value { align-self: start; color: #1e50ff; display: block; font-family: var(--font-heading); font-size: 26px; line-height: 1.25; letter-spacing: -0.035em; white-space: nowrap; }
+  .sec-bento .bento-card .bento-amount-value { align-self: start; color: #3458B8; display: block; font-family: var(--font-heading); font-size: 26px; line-height: 1.25; letter-spacing: -0.035em; white-space: nowrap; }
   .sec-bento .bento-card .desc, .sec-bento .bento-card.yellow .desc { align-self: end; color: #64748b; font-family: var(--font-body); font-size: 13px; line-height: 1.55; }
   .sec-bento .bento-card.peach .btn-peach-cta { align-self: start; margin-top: 8px; padding: 8px 13px; font-size: 12px; box-shadow: none; }
+  .mobile-program-guide { display: none; }
   @media (min-width: 761px) and (max-width: 1024px) {
     .sec-bento .bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .bd-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -3101,6 +3152,11 @@ footer {
 .mobile-video-guide { display: none; }
 .page.sub-mode > .home-program-list { display: none; }
 
+/* 데스크톱에서는 핵심 취업지원 프로그램 섹션을 숨기고, 모바일 펼침 영역만 유지한다. */
+@media (min-width: 761px) {
+  .mobile-home > .home-program-list { display: none; }
+}
+
 /* 홈 화면에서만 후기 · 네트워크 · 소식 영역을 숨기며, 컴포넌트 동작은 유지한다. */
 .mobile-home > .sec-reviews,
 .mobile-home > .sec-three-cards,
@@ -3111,17 +3167,29 @@ footer {
   .mobile-home > .sec-products-wrap,
   .mobile-home > .sec-reviews,
   .mobile-home > .sec-three-cards,
-  .mobile-home > .sec-news,
-  .mobile-home > .sec-contact { display: none; }
+  .mobile-home > .sec-news { display: none; }
 
   .mobile-home > .home-program-list { display: none; }
   .mobile-home > .home-program-list.expanded { display: block; }
   .mobile-home .home-program-list .sec-bento { padding: 24px 20px 36px; }
   .mobile-home .home-program-list .sec-header-center { display: none; }
+  .mobile-home .home-program-list .bento-grid { display: none; }
+  .mobile-home .home-program-list .mobile-program-guide { display: block; }
+  .mobile-program-guide h3 { margin: 0 0 20px; color: #142D66; font-size: 26px; line-height: 1.35; }
+  .mobile-program-guide ol { margin: 0; padding: 0; list-style: none; counter-reset: mobile-program-guide; }
+  .mobile-program-guide li { position: relative; display: grid; gap: 5px; padding: 14px 0 14px 28px; border-top: 1px solid #D2DEEE; counter-increment: mobile-program-guide; }
+  .mobile-program-guide li::before { position: absolute; top: 15px; left: 0; color: #3458B8; content: counter(mobile-program-guide, decimal-leading-zero); font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+  .mobile-program-guide li:last-child { border-bottom: 1px solid #D2DEEE; }
+  .mobile-program-guide li span { color: #52627C; font-size: 13px; line-height: 1.55; }
+  .mobile-program-guide li strong { color: #3458B8; font-size: 14px; line-height: 1.45; }
+  .mobile-program-guide > p { margin: 14px 0 0; color: #6B7A91; font-size: 12px; line-height: 1.65; }
 
-  .mobile-home .hero { padding-bottom: 80px; }
-  .mobile-home .hero-wave-wrap svg { height: 64px; }
-  .mobile-home .hero-wave-wrap::before { display: none; }
+  /* 상황별 안내는 상담 필요 여부를 설명한 뒤에 이어서 보여 준다. */
+  .mobile-home > .sec-contact .contact-program-guide { display: block; }
+
+  .mobile-home .hero { padding-bottom: 114px; }
+  .mobile-home .hero-wave-wrap svg { height: 98px; }
+  .mobile-home .hero-wave-wrap::before { display: grid; }
   .mobile-home .hero-inner { margin: 0; min-width: 0; }
   .mobile-home .hero-title { font-size: clamp(32px, 8.8vw, 38px); }
   .mobile-home .hero-benefit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -3141,13 +3209,20 @@ footer {
   .mobile-home .hero-benefit-card.primary .hero-benefit-unit { font-size: 20px; }
   .mobile-home .hero-benefit-type,
   .mobile-home .hero-benefit-hint { overflow-wrap: anywhere; }
-  .mobile-home .hero .hero-detail-cta { padding: 13px 12px; color: #102779; }
+  .mobile-home .hero .hero-detail-cta { padding: 13px 12px; color: #142D66; }
 
   .mobile-home-summary,
   .mobile-home-programs,
   .mobile-home-smartcare,
   .mobile-home-consult { display: block; padding: 30px 20px; }
-  .mobile-home-summary { background: #FFFFFF; }
+  .mobile-home-summary {
+    background: linear-gradient(
+      180deg,
+      #0A2374 0,
+      #173F96 52%,
+      #2E61AF 100%
+    );
+  }
   .mobile-home-programs {
     background: #f8fbff;
     border-bottom: 1px solid rgba(179, 214, 250, .38);
@@ -3156,16 +3231,19 @@ footer {
   .mobile-home-summary h2,
   .mobile-home-programs h2,
   .mobile-home-smartcare h2,
-  .mobile-home-consult h2 { margin: 0 0 14px; color: #102779; font-size: 22px; line-height: 1.4; word-break: keep-all; }
+  .mobile-home-consult h2 { margin: 0 0 14px; color: #142D66; font-size: 22px; line-height: 1.4; word-break: keep-all; }
+  .mobile-home-summary h2 { color: #FFFFFF; }
   .mobile-home-summary p,
   .mobile-home-programs p,
   .mobile-home-smartcare p { color: var(--text-secondary); font-size: 14px; line-height: 1.8; }
+  .mobile-home-summary p { color: rgba(255, 255, 255, .9); }
   .mobile-home-summary button,
   .mobile-home-programs button,
   .mobile-home-smartcare button { margin-top: 16px; min-height: 44px; border: 0; background: transparent; color: #2455FF; font: inherit; font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
-  .mobile-home-smartcare button { color: #2452DE; }
-  .mobile-home-summary .mobile-video-guide { display: block; margin-top: 12px; padding-top: 12px; border-top: 1px solid #DCE5F1; }
-  .mobile-home-summary .mobile-video-guide-toggle { width: 100%; margin-top: 0; padding: 0; color: #2455FF; }
+  .mobile-home-summary button { color: #FFFFFF; }
+  .mobile-home-smartcare button { color: #3458B8; }
+  .mobile-home-summary .mobile-video-guide { display: block; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .28); }
+  .mobile-home-summary .mobile-video-guide-toggle { width: 100%; margin-top: 0; padding: 0; color: #FFFFFF; }
   .mobile-video-guide-content { margin-top: 10px; }
   .mobile-video-guide-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .mobile-home-summary .mobile-video-guide-list button { min-width: 0; min-height: 44px; margin-top: 0; padding: 10px 8px; border: 1px solid #C9D8F5; border-radius: 10px; background: #FFFFFF; color: #102779; font-size: 13px; font-weight: 600; line-height: 1.35; text-align: center; }
@@ -3174,11 +3252,11 @@ footer {
   .mobile-video-guide-player { margin-top: 10px; overflow: hidden; border-radius: 12px; background: #07154B; }
   .mobile-video-guide-player video { display: block; width: 100%; aspect-ratio: 16 / 9; }
   .mobile-home-consult { text-align: center; background: #F4F7FC; }
-  .mobile-home-consult h2 { color: #152C61; font-size: 20px; }
+  .mobile-home-consult h2 { color: #142D66; font-size: 20px; }
   .mobile-home-consult-actions,
   .mobile-fixed-consult { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .mobile-home-consult button,
-  .mobile-fixed-consult button { min-width: 0; min-height: 48px; padding: 12px 8px; border: 0; border-radius: 999px; background: #2452DE; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+  .mobile-fixed-consult button { min-width: 0; min-height: 48px; padding: 12px 8px; border: 0; border-radius: 999px; background: #3458B8; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 800; white-space: nowrap; cursor: pointer; }
   .mobile-home-consult button:last-child,
   .mobile-fixed-consult button:last-child { border: 1px solid #93C5FD; background: #FFFFFF; color: #102779; }
   .mobile-fixed-consult { position: fixed; z-index: 90; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid #DCE5F1; background: #FFFFFF; box-shadow: 0 -6px 22px rgba(16, 39, 121, .1); }
