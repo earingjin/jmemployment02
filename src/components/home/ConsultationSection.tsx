@@ -6,10 +6,10 @@ export function ConsultationSection() {
     <section className="sec-contact" id="pv-contact-section">
       <div className="contact-box">
         <div className="contact-info">
-          <span style={{ fontSize: '12.5px', fontWeight: 800, color: '#1E50FF', textTransform: 'uppercase' }}>FAST CONSULTATION</span>
-          <h2>청년의 다음 진로,<br />지금 상담을 시작하세요</h2>
+          <span className="contact-eyebrow">FAST CONSULTATION</span>
+          <h2>청년의 다음 진로,<br /><span>지금 상담을 시작하세요</span></h2>
           <p id="pv-contact-intro">신청서를 남겨주시면 가까운 지사의 전담 상담사가 상세히 안내해 드립니다.</p>
-          <div style={{ marginTop: '24px', fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.7 }}>
+          <div className="contact-benefits">
             ✔ 무료 상담<br />
             ✔ 정부지원금 요건 조회<br />
             ✔ 1:1 이력서 &amp; 면접 솔루션 제공
