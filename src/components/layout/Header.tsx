@@ -143,7 +143,7 @@ export function Header({ view, onNavigate, onConsult }: {
                   onClick={() => selectMobileMenu(branch.view)}>{branch.label}</button>
               )}
             </nav>
-            <button className="mobile-menu-consult" type="button" onClick={() => { closeMobileMenu(); onConsult(); }}>무료 상담 신청하기</button>
+            <button className="mobile-menu-consult" type="button" onClick={() => { closeMobileMenu(); onConsult(); }}>상담 신청하기</button>
           </section>
         </div>
       )}

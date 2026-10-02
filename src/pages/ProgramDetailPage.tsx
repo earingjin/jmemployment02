@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { ProgramDetailBlocks } from '../components/ProgramDetailBlocks';
 import { findProgram } from '../data/programs';
 import type { ProgramView } from '../data/navigation';
 
@@ -15,11 +15,17 @@ export function ProgramDetailPage({ programId, onBack, onConsult }: {
   if (!program) return null;
 
   return (
-    <main className="smart-care-page">
-      <section className="bd-hero">
-        {program.seeker && <div className="bd-eyebrow">{program.seeker.kind}</div>}
+    <main className="smart-care-page program-detail-page">
+      <section className="program-detail-hero">
+        {program.seeker && <div className="program-detail-eyebrow">{program.seeker.kind}</div>}
         <h1>{program.label}</h1>
-        {program.seeker && <p>{program.seeker.desc}</p>}
+        {program.seeker && <p className="program-detail-description">{program.seeker.desc}</p>}
+        {program.seeker && (
+          <div className="program-detail-target">
+            <strong>지원 대상</strong>
+            <p>{program.seeker.target}</p>
+          </div>
+        )}
         <div className="smart-care-page-actions">
           <button className="btn-pill-outline" onClick={onBack}>메인으로 돌아가기</button>
           <button className="btn-pill-dark" onClick={onConsult}>상담 신청</button>
@@ -27,16 +33,7 @@ export function ProgramDetailPage({ programId, onBack, onConsult }: {
       </section>
 
       <section className="employment-support-detail" aria-label={`${program.label} 상세 정보`}>
-        {program.detail.map((block, i) => (
-          <article className="employment-support-block" key={i} style={{ background: block.background, border: block.border }}>
-            <strong style={{ color: block.headingColor }}>{block.heading}</strong>
-            <p>
-              {block.lines.map((line, j) => (
-                <Fragment key={j}>{j > 0 && <br />}{line}</Fragment>
-              ))}
-            </p>
-          </article>
-        ))}
+        <ProgramDetailBlocks blocks={program.detail} />
       </section>
 
       <div className="smart-care-page-actions">

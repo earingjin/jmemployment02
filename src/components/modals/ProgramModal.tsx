@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { ProgramDetailBlocks } from '../ProgramDetailBlocks';
 import { findProgram } from '../../data/programs';
 import { ModalOverlay } from '../common/ModalOverlay';
 
@@ -56,12 +56,7 @@ export function ProgramModal({ open, programId, audience, onClose, onOpenDetail,
         </div>
         <div className="pm-body" id="pmBody">
           {summary}
-          {p?.detail.map((block, i) => (
-            <div key={i} style={{ background: block.background, border: block.border, borderRadius: '12px', padding: '18px', marginBottom: block.marginBottom ? '18px' : undefined }}>
-              <strong style={{ color: block.headingColor, display: 'block', marginBottom: '6px' }}>{block.heading}</strong>
-              {block.lines.map((line, j) => <Fragment key={j}>{j > 0 && <br />}{line}</Fragment>)}
-            </div>
-          ))}
+          {p && <ProgramDetailBlocks blocks={p.detail} headingLevel={4} />}
           {switcher}
         </div>
         <div className="pm-foot">

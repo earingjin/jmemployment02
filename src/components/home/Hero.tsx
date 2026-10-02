@@ -55,7 +55,7 @@ export function Hero({ onConsult, onBranch, onDetail }: {
 
           <div className="hero-actions">
             <button className="btn-pill-dark hero-consult-cta" onClick={onConsult}>
-              무료 상담 신청하기 ↗
+              상담 신청하기 ↗
             </button>
             <button className="btn-pill-outline hero-detail-cta" onClick={onDetail}>
               국민취업지원제도 자세히 보기 →

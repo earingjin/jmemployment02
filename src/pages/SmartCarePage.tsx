@@ -2,17 +2,16 @@ import { SMART_SOLUTIONS } from '../data/content';
 
 export function SmartCarePage({ onBack, onConsult }: { onBack: () => void; onConsult: () => void }) {
   return (
-    <main className="smart-care-page">
-      <section className="bd-hero">
-        <div className="bd-eyebrow">SmartCare</div>
+    <main className="smart-care-page program-detail-page smart-care-detail-page">
+      <section className="program-detail-hero">
+        <div className="program-detail-eyebrow">SmartCare</div>
         <h1>취업 준비 단계별 SmartCare 서비스를 확인하세요</h1>
-        <p>진단부터 서류 준비, 면접, 역량 확인까지 필요한 서비스를 살펴보세요.</p>
+        <p className="program-detail-description">진단부터 서류 준비, 면접, 역량 확인까지 필요한 서비스를 살펴보세요.</p>
       </section>
       <div className="smart-care-detail-list" aria-label="SmartCare 상세 서비스">
-        {SMART_SOLUTIONS.map((solution, index) => (
-          <section className="smart-care-detail-item" key={solution.key}>
+        {SMART_SOLUTIONS.map((solution) => (
+          <section className="smart-care-detail-item program-detail-card" key={solution.key}>
             <div className="smart-care-detail-heading">
-              <span className="smart-care-detail-number">{String(index + 1).padStart(2, '0')}</span>
               <span className="smart-care-detail-stage">{solution.stage}</span>
               <h2>{solution.title}</h2>
             </div>

@@ -1785,7 +1785,7 @@ h3,
 ======================================================== */
 .sec-contact {
   padding: 96px 28px;
-  background: #F4F7FC;
+  background: #E8F0FB;
 }
 
 .contact-box {
@@ -2163,31 +2163,6 @@ h3,
   color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.8;
-}
-
-/* 국민취업지원제도 상세 페이지: ProgramModal의 pm-body 블록과 동일한 시각 언어(카드형 안내 박스) */
-.employment-support-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-top: 36px;
-}
-
-.employment-support-block {
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.employment-support-block strong {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 15px;
-}
-
-.employment-support-block p {
-  font-size: 14.5px;
-  line-height: 1.7;
-  color: var(--text-secondary);
 }
 
 .employment-support-source {
@@ -3323,4 +3298,74 @@ footer {
   .mobile-home-smartcare button:focus-visible,
   .mobile-home-consult button:focus-visible,
   .mobile-fixed-consult button:focus-visible { outline: 3px solid #60A5FA; outline-offset: 3px; }
+}
+
+/* 다섯 상세페이지의 공통 디자인. 홈의 버튼과 카드에는 적용하지 않는다. */
+.program-detail-page { max-width: 1120px; padding: 40px 28px 72px; }
+.program-detail-hero { padding: 36px; border: 1px solid #DCE2E9; border-radius: 16px; background: #F6F8FA; }
+.program-detail-eyebrow { display: block; margin-bottom: 12px; color: #52647A; font-size: 14px; font-weight: 700; }
+.program-detail-hero h1 { margin: 0 0 18px; color: #25364A; font-size: clamp(30px, 3.2vw, 40px); line-height: 1.35; letter-spacing: -.035em; }
+.program-detail-description { max-width: 780px; margin: 0; color: #475569; font-size: 18px; line-height: 1.85; }
+.program-detail-target { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 16px; margin-top: 24px; padding: 20px; border: 1px solid #DCE2E9; border-radius: 12px; background: #FFF; font-size: 16px; line-height: 1.8; }
+.program-detail-target strong { color: #25364A; }
+.program-detail-target p { margin: 0; color: #475569; }
+.program-detail-page .smart-care-page-actions { justify-content: flex-start; margin-top: 28px; }
+.program-detail-page .smart-care-page-actions button { min-height: 48px; justify-content: center; white-space: normal; font-weight: 700; }
+.program-detail-page .btn-pill-dark { border-color: #34465C; background: #34465C; color: #FFFFFF; box-shadow: none; }
+.program-detail-page .btn-pill-dark:hover { border-color: #25364A; background: #25364A; color: #FFFFFF; transform: none; box-shadow: none; }
+.program-detail-page .btn-pill-dark:focus, .program-detail-page .btn-pill-dark:focus-visible { color: #FFFFFF; }
+.program-detail-page .btn-pill-outline { border-color: #64748B; background: #FFFFFF; color: #34465C; }
+.program-detail-page .btn-pill-outline:hover, .program-detail-page .btn-pill-outline:focus { border-color: #34465C; background: #F1F5F9; color: #25364A; transform: none; box-shadow: none; }
+.program-detail-page .smart-care-page-actions button:focus-visible { outline: 3px solid #52647A; outline-offset: 4px; }
+.program-detail-page .employment-support-detail { display: block; margin-top: 28px; }
+.program-detail-blocks { display: grid; gap: 20px; }
+.program-detail-card { min-width: 0; padding: 28px; border: 1px solid #DCE2E9; border-radius: 16px; background: #FFFFFF; }
+.program-detail-heading { margin: 0 0 16px; color: #25364A; font-size: 20px; font-weight: 700; line-height: 1.5; }
+.program-detail-lines { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; color: #475569; font-size: 16px; line-height: 1.85; }
+.program-detail-lines li { min-width: 0; }
+.program-detail-card--benefit { background: #F6F8FA; }
+.program-detail-card--benefit .program-detail-lines li { padding: 12px 0; border-top: 1px solid #DCE2E9; color: #34465C; font-weight: 600; }
+.program-detail-card--benefit .program-detail-lines li:first-child { padding-top: 0; border-top: 0; font-size: 18px; font-weight: 700; }
+.program-detail-card--eligibility .program-detail-lines li { padding: 12px 0; border-top: 1px solid #E7ECF1; }
+/* 원문의 단계 번호만 표시한다. */
+.program-detail-card--steps .program-detail-lines { gap: 0; }
+.program-detail-card--steps .program-detail-lines li { padding: 14px 0; border-bottom: 1px solid #E7ECF1; }
+.program-detail-card--steps .program-detail-lines li:first-child { padding-top: 0; }
+.program-detail-card--steps .program-detail-lines li:last-child { padding-bottom: 0; border-bottom: 0; }
+.program-detail-page, .program-detail-card, .program-modal { overflow-wrap: anywhere; word-break: keep-all; }
+/* SmartCare는 기존 단계별 서비스를 동일한 카드 규칙으로 표시한다. */
+.smart-care-detail-page .smart-care-detail-list { display: grid; gap: 20px; max-width: none; margin: 28px 0 0; }
+.smart-care-detail-page .smart-care-detail-item { grid-template-columns: minmax(200px, .8fr) minmax(0, 1.6fr); gap: 28px; padding: 28px; border: 1px solid #DCE2E9; }
+.smart-care-detail-page .smart-care-detail-stage { color: #52647A; font-size: 14px; }
+.smart-care-detail-page .smart-care-detail-heading h2 { margin: 8px 0 0; color: #25364A; font-size: 20px; font-weight: 700; line-height: 1.5; }
+.smart-care-detail-page .smart-care-detail-content { min-width: 0; color: #475569; font-size: 16px; line-height: 1.85; }
+.smart-care-detail-page .smart-care-detail-content p, .smart-care-detail-page .smart-care-detail-content ul { color: inherit; line-height: inherit; }
+.smart-care-detail-page .smart-care-detail-content ul { margin-top: 16px; }
+.smart-care-detail-page .smart-care-detail-content li + li { margin-top: 8px; }
+.program-modal .program-detail-card { padding: 22px; }
+.program-modal .program-detail-heading { font-size: 18px; }
+.program-modal .pm-head, .program-modal .pm-foot { flex-shrink: 0; }
+.program-modal .pm-head { gap: 12px; }
+.program-modal .close-btn { flex-shrink: 0; }
+.program-modal .pm-body { min-height: 0; }
+.program-modal .pm-switch { margin-top: 20px; white-space: normal; }
+@media (max-width: 768px) {
+  .program-detail-page { padding: 28px 20px 56px; }
+  .program-detail-hero { padding: 28px; }
+  .program-detail-description { font-size: 17px; }
+  .smart-care-detail-page .smart-care-detail-item { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+}
+@media (max-width: 480px) {
+  .program-detail-page { padding: 20px 16px 48px; }
+  .program-detail-hero { padding: 24px 20px; }
+  .program-detail-hero h1 { font-size: 30px; }
+  .program-detail-description { font-size: 16px; }
+  .program-detail-target { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 16px; }
+  .program-detail-card, .smart-care-detail-page .smart-care-detail-item, .program-modal .program-detail-card { padding: 20px 16px; }
+  .program-detail-lines { gap: 14px; }
+  .program-modal-overlay { padding: 12px; }
+  .program-modal .pm-head, .program-modal .pm-body { padding: 20px 16px; }
+  .program-modal .pm-foot { padding: 14px 16px; }
+  .program-modal .pm-foot button { width: 100%; min-height: 48px; }
+  .program-modal .pm-head h3 { font-size: 20px; }
 }
