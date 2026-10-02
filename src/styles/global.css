@@ -1796,22 +1796,46 @@ h3,
 .contact-guidance {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(40px, 7vw, 108px);
+  grid-template-areas: 'intro programs' 'submit programs';
+  gap: 24px 32px;
+  align-items: start;
 }
-.contact-guidance h2 {
-  margin: 0 0 18px;
+.sec-contact .contact-heading {
+  margin: 0 0 32px;
   color: #142D66;
   font-size: clamp(26px, 2.2vw, 34px);
   font-weight: 900;
   line-height: 1.4;
   letter-spacing: -.04em;
+  text-align: center;
 }
-.contact-guidance p {
+.sec-contact .contact-guidance p {
   margin: 0;
   color: #52627C;
-  font-size: 14px;
-  line-height: 1.75;
+  font-size: 16px;
+  line-height: 1.85;
 }
+.sec-contact .contact-guide-toggle { display: none; }
+.sec-contact .contact-guidance-intro { grid-area: intro; min-width: 0; padding: 8px 0; }
+.sec-contact .contact-program-guide {
+  grid-area: programs;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #D8E2F0;
+  border-radius: 20px;
+  background: #FFFFFF;
+}
+.sec-contact .contact-guidance > .btn-contact-submit {
+  grid-area: submit;
+  display: block;
+  margin-top: 0;
+  padding: 18px 24px;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1.5;
+}
+.sec-contact .contact-heading,
+.sec-contact .contact-guidance { overflow-wrap: anywhere; word-break: keep-all; }
 .contact-guidance-intro p + p { margin-top: 12px; }
 .contact-guidance-intro .btn-contact-submit {
   display: block;
@@ -1847,8 +1871,8 @@ h3,
   letter-spacing: .04em;
 }
 .contact-program-guide li:last-child { border-bottom: 1px solid #D8E2F0; }
-.contact-program-guide li span { color: #52627C; font-size: 13px; line-height: 1.55; }
-.contact-program-guide li strong { color: #3458B8; font-size: 14px; line-height: 1.45; }
+.contact-program-guide li span { color: #52627C; font-size: 14px; line-height: 1.65; }
+.contact-program-guide li strong { color: #28478F; font-size: 17px; line-height: 1.5; }
 .contact-program-guide-note { margin-top: 14px !important; color: #6B7A91 !important; font-size: 12px !important; line-height: 1.65 !important; }
 .contact-form {
   display: flex;
@@ -1876,13 +1900,47 @@ h3,
 .contact-guidance-intro .btn-contact-submit:focus-visible { outline: 3px solid #5274B8; outline-offset: 4px; }
 @media (max-width: 1024px) {
   .sec-contact { padding: 80px 28px; }
-  .contact-guidance { grid-template-columns: 1fr; gap: 36px; }
+  .contact-guidance { gap: 20px 24px; }
 }
-@media (max-width: 640px) {
+@media (max-width: 760px) {
   .sec-contact { padding: 64px 20px; }
-  .sec-contact .contact-box { gap: 32px; }
+  .sec-contact .contact-heading { margin-bottom: 24px; font-size: 26px; }
+  .sec-contact .contact-guide-toggle {
+    display: inline-flex;
+    width: auto;
+    min-height: 44px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    margin-top: 16px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #3458B8;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+  }
+  .sec-contact .contact-guide-toggle span:last-child { flex-shrink: 0; font-size: 16px; line-height: 1; }
+  .sec-contact .contact-guidance { display: none; }
+  .sec-contact .contact-guidance.is-expanded {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'intro' 'programs' 'submit';
+    margin-top: 24px;
+    gap: 24px;
+  }
+  .sec-contact .contact-program-guide { padding: 20px 16px; }
+  .sec-contact .contact-guidance p { font-size: 14px; }
+  .sec-contact .contact-program-guide-note { font-size: 12px; }
   .sec-contact .btn-contact-submit { min-height: 48px; }
+  .sec-contact .contact-guidance > .btn-contact-submit { display: none; }
 }
+.sec-contact .contact-guide-toggle:focus-visible,
+.sec-contact .btn-contact-submit:focus-visible { outline: 3px solid #5274B8; outline-offset: 4px; }
 
 .contact-form input,
 .contact-form select,
