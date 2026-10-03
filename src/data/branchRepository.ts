@@ -70,7 +70,7 @@ function toPublicBranch(row: PublicBranchRow): Branch {
 // RLS 공개 조회 정책을 설정한 후 사용
 export async function getBranches(): Promise<BranchMap> {
   const rows = await supabaseRequest<PublicBranchRow[]>(
-    'branches?select=slug,phone,address,map_url,region,hours,published,program_ids'
+    'public_branches?select=slug,phone,address,map_url,region,hours,published,program_ids'
   );
 
   const branches: BranchMap = {};
