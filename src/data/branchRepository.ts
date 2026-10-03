@@ -7,7 +7,7 @@ import {
 
 import { supabaseRequest } from '../lib/supabase';
 
-// Supabase DB의 컬럼 구조
+// 데이터베이스의 전체 지사 구조
 interface BranchRow {
   slug: string;
   phone: string;
@@ -21,7 +21,20 @@ interface BranchRow {
   program_ids: string[];
 }
 
-// DB 데이터 → React에서 사용하는 데이터
+// 공개 화면에서 사용하는 컬럼만 선택
+type PublicBranchRow = Pick<
+  BranchRow,
+  | 'slug'
+  | 'phone'
+  | 'address'
+  | 'map_url'
+  | 'region'
+  | 'hours'
+  | 'published'
+  | 'program_ids'
+>;
+
+// DB 전체 데이터 → 기존 React 구조
 function toBranch(row: BranchRow): Branch {
   return {
     slug: row.slug,
@@ -37,11 +50,27 @@ function toBranch(row: BranchRow): Branch {
   };
 }
 
-// 전체 지사 조회
-// 공개 조회 정책이 준비된 후 App.tsx에 연결할 예정
+// 공개 데이터 → 기존 React 구조
+function toPublicBranch(row: PublicBranchRow): Branch {
+  return {
+    slug: row.slug,
+    phone: row.phone,
+    address: row.address,
+    contactManagerName: '',
+    contactManagerEmail: '',
+    mapUrl: row.map_url,
+    region: row.region,
+    hours: row.hours,
+    published: row.published,
+    programIds: row.program_ids,
+  };
+}
+
+// 공개 지사 정보 조회
+// RLS 공개 조회 정책을 설정한 후 사용
 export async function getBranches(): Promise<BranchMap> {
-  const rows = await supabaseRequest<BranchRow[]>(
-    'branches?select=*&order=slug.asc'
+  const rows = await supabaseRequest<PublicBranchRow[]>(
+    'branches?select=slug,phone,address,map_url,region,hours,published,program_ids'
   );
 
   const branches: BranchMap = {};
@@ -51,31 +80,30 @@ export async function getBranches(): Promise<BranchMap> {
       continue;
     }
 
-    branches[row.slug] = toBranch(row);
+    branches[row.slug] = toPublicBranch(row);
   }
 
-  // RLS로 조회가 차단된 상태를 정상 데이터로 오인하지 않음
+  // 현재 단계에서는 기존 20개 지사의 완전한 조회를 요구
   const missing = ADMIN_BRANCHES.filter(
     slug => !branches[slug]
   );
 
   if (missing.length > 0) {
     throw new Error(
-      `지사 데이터를 모두 조회하지 못했습니다: ${missing.join(', ')}`
+      `지사 데이터 조회 실패: ${missing.join(', ')}`
     );
   }
 
   return branches;
 }
 
-// 관리자 화면에서 수정할 수 있는 항목
+// 관리자 수정 허용 항목
 export type BranchUpdate = Pick<
   Branch,
   'phone' | 'address' | 'hours' | 'region'
 >;
 
-// 지사 정보 저장
-// 인증 기능 구현 후 유효한 관리자 accessToken을 전달
+// 관리자 인증 연결 후 사용할 저장 함수
 export async function updateBranch(
   slug: string,
   patch: BranchUpdate,
