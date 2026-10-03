@@ -10,7 +10,7 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
   openSeq: number; // 관리자 화면을 열 때마다 증가 (원본 showAdmin()의 목록·편집기 재렌더링 시점)
   branches: BranchMap;
   benefitYear: string;
-  onSaveBranch: (slug: string, patch: BranchPatch) => void;
+  onSaveBranch: (slug: string, patch: BranchPatch) => Promise<void>;
   onSaveBenefitYear: (year: string) => void;
   onBack: () => void;
 }) {
@@ -105,16 +105,49 @@ function useFlash(): [boolean, () => void] {
   return [flash, trigger];
 }
 
-function BranchEditor({ slug, branch, onSave }: { slug: string; branch: Branch; onSave: (patch: BranchPatch) => void }) {
+
+function BranchEditor({
+  slug,
+  branch,
+  onSave,
+}: {
+  slug: string;
+  branch: Branch;
+  onSave: (patch: BranchPatch) => Promise<void>;
+}) {
   const phone = useRef<HTMLInputElement>(null);
   const address = useRef<HTMLInputElement>(null);
   const hours = useRef<HTMLInputElement>(null);
   const region = useRef<HTMLSelectElement>(null);
-  const [saved, flashSaved] = useFlash();
 
-  const save = () => {
-    onSave({ phone: phone.current!.value, address: address.current!.value, hours: hours.current!.value, region: region.current!.value });
-    flashSaved();
+  const [saved, flashSaved] = useFlash();
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  const save = async () => {
+    if (saving) return;
+
+    setSaving(true);
+    setSaveError('');
+
+    try {
+      await onSave({
+        phone: phone.current!.value,
+        address: address.current!.value,
+        hours: hours.current!.value,
+        region: region.current!.value,
+      });
+
+      flashSaved();
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : '저장 중 오류가 발생했습니다.'
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -124,7 +157,8 @@ function BranchEditor({ slug, branch, onSave }: { slug: string; branch: Branch; 
           <div style={{ fontSize: '12px', color: '#94A3B8' }}>지사 정보 편집</div>
           <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#FFF' }}>{`${slug}${branchSuffix(slug)} 설정`}</h2>
         </div>
-        <button className="admin-save-btn" id="saveBtnBranch" onClick={save}>{saved ? '저장 완료!' : '저장하기'}</button>
+        <button className="admin-save-btn" id="saveBtnBranch" onClick={save} disabled={saving}>{saving ? '저장 중...' : saved ? '저장 완료!' : '저장하기'}</button>
+        {saveError && (<p role="alert" style={{ color: '#FCA5A5', fontSize: '13px' }}>{saveError}</p>)}
       </div>
       <div className="admin-card">
         <div className="admin-card-title">기본 연락처 및 정보</div>
