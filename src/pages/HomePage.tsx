@@ -33,18 +33,16 @@ const currentView = () => viewFromPath(window.location.pathname);
 const pushPath = (path: string) => { if (window.location.pathname !== path) window.history.pushState({}, '', path); };
 
 // 공개 사이트 전체 (원본 #publicPage)
-export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
-  hidden: boolean;
+export function HomePage({ branches, benefitYear }: {
   branches: BranchMap;
   benefitYear: string;
-  onShowAdmin: () => void;
 }) {
   const [view, setView] = useState<View>(currentView);
   const publicRef = useRef<HTMLDivElement>(null);
   const [stickyConsultVisible, setStickyConsultVisible] = useState(false);
 
   useEffect(() => {
-    if (view !== 'home' || hidden) { setStickyConsultVisible(false); return; }
+    if (view !== 'home') { setStickyConsultVisible(false); return; }
     const root = publicRef.current;
     const heroButton = root?.querySelector('.hero-consult-cta');
     const footer = root?.querySelector('footer');
@@ -72,7 +70,7 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
       if (frameId !== null) window.cancelAnimationFrame(frameId);
       mobile.removeEventListener('change', update);
     };
-  }, [view, hidden]);
+  }, [view]);
   const [bdRegion, setBdRegion] = useState('전체');
   const [legalModal, setLegalModal] = useState<LegalContentId | null>(null);
   const [programModal, setProgramModal] = useState<{ open: boolean; programId: string | null; audience: Audience }>({ open: false, programId: null, audience: 'seeker' });
@@ -127,7 +125,7 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
   };
 
   return (
-    <div id="publicPage" ref={publicRef} style={hidden ? { display: 'none' } : undefined}>
+    <div id="publicPage" ref={publicRef}>
       <Header view={view} onNavigate={navigate} onConsult={goToConsult} />
 
       <div className={'page' + (view !== 'home' ? ' sub-mode' : ' mobile-home')}>
@@ -164,7 +162,7 @@ export function HomePage({ hidden, branches, benefitYear, onShowAdmin }: {
             <button type="button" onClick={() => openBranchDirectory()}>전국 지사 안내 ↗</button>
           </div>
         </section>}
-      <Footer onLegal={setLegalModal} onAdmin={onShowAdmin} />
+      <Footer onLegal={setLegalModal} />
       </div>
 
       {view === 'home' && stickyConsultVisible && <aside className="mobile-fixed-consult" aria-label="빠른 메뉴">

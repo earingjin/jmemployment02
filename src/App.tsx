@@ -1,12 +1,18 @@
 
-import { useEffect, useState } from 'react';
-import { AdminPage, type BranchPatch } from './components/admin/AdminPage';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import type { BranchPatch } from './components/admin/AdminPage';
 import {
   createInitialBranches,
   type BranchMap,
 } from './data/branches';
 import { DEFAULT_BENEFIT_YEAR } from './data/content';
 import { HomePage } from './pages/HomePage';
+
+const AdminPage = lazy(() =>
+  import('./components/admin/AdminPage').then(module => ({ default: module.AdminPage }))
+);
+
+const currentPath = () => window.location.pathname.replace(/\/$/, '') || '/';
 
 const STORAGE_KEY = 'jmcareer_demo_branches';
 
@@ -73,8 +79,13 @@ export default function App() {
   const [benefitYear, setBenefitYear] =
     useState(DEFAULT_BENEFIT_YEAR);
 
-  const [adminVisible, setAdminVisible] = useState(false);
-  const [adminOpenSeq, setAdminOpenSeq] = useState(0);
+  const [pathname, setPathname] = useState(currentPath);
+
+  useEffect(() => {
+    const onPopState = () => setPathname(currentPath());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -114,11 +125,6 @@ export default function App() {
       cancelled = true;
     };
   }, []);
-
-  const showAdmin = () => {
-    setAdminVisible(true);
-    setAdminOpenSeq(s => s + 1);
-  };
 
   const saveBranch = async (
     slug: string,
@@ -166,24 +172,25 @@ export default function App() {
     setBranches(updated);
   };
 
-  return (
-    <>
-      <HomePage
-        hidden={adminVisible}
-        branches={branches}
-        benefitYear={benefitYear}
-        onShowAdmin={showAdmin}
-      />
+  if (pathname === '/admin') {
+    return (
+      <Suspense fallback={<div role="status">관리자 화면을 불러오는 중...</div>}>
+        <AdminPage
+          visible={true}
+          openSeq={0}
+          branches={branches}
+          benefitYear={benefitYear}
+          onSaveBranch={saveBranch}
+          onSaveBenefitYear={setBenefitYear}
+          onBack={() => {
+            window.history.pushState({}, '', '/');
+            setPathname('/');
+            window.scrollTo({ top: 0 });
+          }}
+        />
+      </Suspense>
+    );
+  }
 
-      <AdminPage
-        visible={adminVisible}
-        openSeq={adminOpenSeq}
-        branches={branches}
-        benefitYear={benefitYear}
-        onSaveBranch={saveBranch}
-        onSaveBenefitYear={setBenefitYear}
-        onBack={() => setAdminVisible(false)}
-      />
-    </>
-  );
+  return <HomePage branches={branches} benefitYear={benefitYear} />;
 }

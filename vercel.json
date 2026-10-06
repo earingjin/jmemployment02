@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/admin/", "destination": "/index.html" },
     { "source": "/employment-support", "destination": "/index.html" },
     { "source": "/job-leap", "destination": "/index.html" },
     { "source": "/future-experience", "destination": "/index.html" },
