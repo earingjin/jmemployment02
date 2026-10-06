@@ -131,3 +131,49 @@ export async function changeAdminPassword(
   }
   return true;
 }
+
+
+export interface FixedAdminSession {
+  id: string;
+  created_at: string;
+  expires_at: string;
+}
+
+export class AdminSessionError extends Error {}
+
+export async function requestFixedAdminSession(
+  method: 'POST' | 'GET' | 'DELETE',
+  sessionId?: string
+): Promise<FixedAdminSession | null> {
+  const { data, error } = await getSupabaseAuthClient().auth.getSession();
+  if (error || !data.session) throw new AdminSessionError('관리자 인증이 필요합니다.');
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-session`, {
+      method,
+      cache: 'no-store',
+      signal: controller.signal,
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${data.session.access_token}`,
+        ...(sessionId ? { 'x-admin-session-id': sessionId } : {}),
+      },
+    });
+    if (!response.ok) throw new AdminSessionError('관리자 세션을 확인할 수 없습니다.');
+    if (method === 'DELETE') return null;
+    const result: unknown = await response.json();
+    if (!result || typeof result !== 'object' ||
+      !('id' in result) || typeof result.id !== 'string' || !result.id ||
+      !('created_at' in result) || typeof result.created_at !== 'string' ||
+      !('expires_at' in result) || typeof result.expires_at !== 'string' ||
+      !Number.isFinite(Date.parse(result.created_at)) || !Number.isFinite(Date.parse(result.expires_at)) ||
+      Date.parse(result.expires_at) <= Date.parse(result.created_at) ||
+      (method === 'GET' && result.id !== sessionId)) {
+      throw new AdminSessionError('관리자 세션 응답을 확인할 수 없습니다.');
+    }
+    return { id: result.id, created_at: result.created_at, expires_at: result.expires_at };
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
