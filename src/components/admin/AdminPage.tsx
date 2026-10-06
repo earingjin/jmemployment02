@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ADMIN_BRANCHES, BRANCH_REGIONS, branchSuffix, type Branch, type BranchMap } from '../../data/branches';
 
 export type BranchPatch = Pick<Branch, 'phone' | 'address' | 'hours' | 'region'>;
 
 // 관리자 대시보드 (원본 #adminPage)
 // 원본과 동일하게 수정 내용은 현재 브라우저 메모리에만 반영된다(저장소·서버·인증 없음, 새로고침 시 초기화).
-export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranch, onSaveBenefitYear, onBack }: {
+export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranch, onSaveBenefitYear, onBack, accountActions }: {
   visible: boolean;
   openSeq: number; // 관리자 화면을 열 때마다 증가 (원본 showAdmin()의 목록·편집기 재렌더링 시점)
   branches: BranchMap;
@@ -13,6 +13,7 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
   onSaveBranch: (slug: string, patch: BranchPatch) => Promise<void>;
   onSaveBenefitYear: (year: string) => void;
   onBack: () => void;
+  accountActions?: ReactNode;
 }) {
   const [activeSlug, setActiveSlug] = useState('본사');
   const [adminMode, setAdminMode] = useState<'branch' | 'common'>('branch');
@@ -77,6 +78,7 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
         </div>
 
         <div className="admin-main">
+          {accountActions}
           <div id="branchEditorView" style={{ display: adminMode === 'branch' ? 'block' : 'none' }}>
             <BranchEditor key={`${activeSlug}-${branchEditorSeq}`} slug={activeSlug} branch={branches[activeSlug]} onSave={patch => onSaveBranch(activeSlug, patch)} />
           </div>
