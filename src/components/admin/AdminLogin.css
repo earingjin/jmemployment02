@@ -1,0 +1,43 @@
+.admin-login-shell {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #0f172a;
+  color: #fff;
+}
+.admin-login-card {
+  width: 100%;
+  max-width: 380px;
+  padding: 32px;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  background: #1e293b;
+}
+.admin-login-card h1 { margin: 0 0 28px; font-size: 24px; font-weight: 800; }
+.admin-login-card label { display: block; margin: 18px 0 8px; font-weight: 600; }
+.admin-login-card input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #64748b;
+  border-radius: 6px;
+  background: #0f172a;
+  color: #fff;
+  font: inherit;
+}
+.admin-login-card button {
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px;
+  border: 0;
+  border-radius: 6px;
+  background: #1e50ff;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-login-card button:disabled { opacity: .6; cursor: wait; }
+.admin-login-card input:focus-visible, .admin-login-card button:focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
+.admin-login-error { margin-top: 16px; color: #fca5a5; font-size: 14px; }

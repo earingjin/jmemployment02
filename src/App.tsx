@@ -8,8 +8,8 @@ import {
 import { DEFAULT_BENEFIT_YEAR } from './data/content';
 import { HomePage } from './pages/HomePage';
 
-const AdminPage = lazy(() =>
-  import('./components/admin/AdminPage').then(module => ({ default: module.AdminPage }))
+const AdminRoute = lazy(() =>
+  import('./components/admin/AdminRoute').then(module => ({ default: module.AdminRoute }))
 );
 
 const currentPath = () => window.location.pathname.replace(/\/$/, '') || '/';
@@ -175,7 +175,7 @@ export default function App() {
   if (pathname === '/admin') {
     return (
       <Suspense fallback={<div role="status">관리자 화면을 불러오는 중...</div>}>
-        <AdminPage
+        <AdminRoute
           visible={true}
           openSeq={0}
           branches={branches}
