@@ -1,12 +1,19 @@
 .admin-management-header h1 { margin: 0 0 16px; font-size: 24px; font-weight: 800; }
+.admin-navigation-header { grid-column: 1 / -1; padding: 24px 40px; border-bottom: 1px solid #1e2d60; }
+#adminPage .admin-shell { grid-template-rows: auto 1fr; }
+.admin-navigation-header .admin-management-tabs { margin-bottom: 0; }
 .admin-management-tabs { display: flex; gap: 6px; margin-bottom: 28px; padding: 6px; border: 1px solid #1e2d60; border-radius: 8px; background: #0c1a45; }
 .admin-management-tabs .admin-mode-btn { padding: 12px 8px; white-space: nowrap; }
 .admin-management-tabs button:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
 .admin-management-description { color: #94a3b8; font-size: 14px; line-height: 1.7; }
 #adminPage .admin-main { min-width: 0; }
+#adminPage .admin-shell-programs .admin-main { overflow: visible; }
+.admin-program-navigation-slot { flex: 1; }
+#adminPage label.admin-card-title { display: block; }
 @media (max-width: 900px) {
   #adminPage .admin-shell { grid-template-columns: 220px minmax(0, 1fr); }
   #adminPage .admin-main { padding: 24px 16px; }
+  .admin-navigation-header { padding: 24px 16px; }
   .admin-management-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 600px) {

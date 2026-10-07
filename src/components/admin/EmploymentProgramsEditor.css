@@ -1,0 +1,42 @@
+.employment-cms { min-width: 0; }
+.employment-cms-note { color: #94a3b8; font-size: 13px; line-height: 1.7; }
+.employment-program-navigation { position: sticky; top: 16px; padding: 16px 12px; }
+.employment-program-navigation h2 { margin-bottom: 4px; font-size: 15px; font-weight: 800; }
+.employment-program-navigation p { margin-bottom: 16px; color: #94a3b8; font-size: 12px; }
+.employment-program-navigation .admin-branch-item { margin-bottom: 6px; line-height: 1.6; }
+.employment-program-navigation button:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+.employment-quick-navigation { position: sticky; top: 0; z-index: 2; padding: 12px; margin-bottom: 24px; border: 1px solid #1e2d60; border-radius: 8px; background: #0c1a45; }
+.employment-quick-navigation nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.employment-quick-navigation a { display: block; padding: 6px 10px; border: 1px solid #475569; border-radius: 6px; color: #e2e8f0; font-size: 13px; text-decoration: none; line-height: 1.6; }
+.employment-quick-navigation a:hover { background: #18285c; }
+.employment-quick-navigation details { margin-top: 10px; }
+.employment-quick-navigation summary { color: #94a3b8; cursor: pointer; font-size: 13px; }
+.employment-quick-navigation .employment-section-links { max-height: 100px; overflow-y: auto; margin-top: 10px; }
+.employment-navigation-target { scroll-margin-top: 280px; }
+.employment-navigation-target:focus-visible, .employment-quick-navigation :is(a, summary):focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
+.employment-cms-program-name { margin: 24px 0; font-size: 22px; font-weight: 800; }
+.employment-cms-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.employment-cms-field { min-width: 0; }
+.employment-cms-field-wide { grid-column: 1 / -1; }
+.employment-cms-input-wrap + .employment-cms-input-wrap { margin-top: 12px; }
+.employment-cms-line-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 8px; }
+.employment-cms-line-row textarea { min-width: 0; }
+.employment-cms-line-button { padding: 8px 12px; border: 1px solid #475569; border-radius: 6px; background: transparent; color: #cbd5e1; font: inherit; font-size: 13px; cursor: pointer; }
+.employment-cms-line-button:hover:not(:disabled) { background: #18285c; }
+.employment-cms-line-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.employment-cms label { display: block; }
+.employment-cms textarea { display: block; resize: vertical; min-height: 80px; }
+.employment-cms input[type="date"] { color-scheme: dark; }
+.employment-cms-save-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.employment-cms button:disabled { opacity: .5; cursor: default; }
+.employment-cms-success { margin-top: 12px; color: #86efac; font-size: 13px; }
+.employment-cms-error { margin-top: 12px; color: #fca5a5; font-size: 13px; line-height: 1.7; }
+.employment-cms :is(button, input, textarea):focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+@media (max-width: 600px) {
+  .employment-program-navigation { position: static; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .employment-program-navigation :is(h2, p) { grid-column: 1 / -1; }
+  .employment-program-navigation .admin-branch-item { margin-bottom: 0; }
+  .employment-cms-fields { grid-template-columns: minmax(0, 1fr); }
+  .employment-cms-card { padding: 16px; }
+  .employment-cms-save-row .admin-save-btn { width: 100%; }
+}

@@ -13,11 +13,19 @@ export function BranchImageEditor({ slug, branch, onUpload, onDelete, onSaveSett
   onDelete: (slot: BranchImageSlot) => Promise<void>;
   onSaveSettings: (slot: BranchImageSlot, settings: BranchImageSettings) => Promise<void>;
 }) {
-  return <>{([1, 2] as const).map(slot => <ImageSlotEditor key={slot} slug={slug} slot={slot}
-    imagePath={slot === 1 ? branch.imagePath : branch.imagePath2}
-    settings={slot === 1 ? { zoom: branch.imageZoom, positionX: branch.imagePositionX, positionY: branch.imagePositionY }
-      : { zoom: branch.image2Zoom, positionX: branch.image2PositionX, positionY: branch.image2PositionY }}
-    onUpload={file => onUpload(slot, file)} onDelete={() => onDelete(slot)} onSaveSettings={settings => onSaveSettings(slot, settings)} />)}</>;
+  return <section className="branch-image-management" aria-labelledby="branch-image-management-title">
+    <div className="branch-image-management-heading">
+      <h3 id="branch-image-management-title" className="admin-card-title">대표사진</h3>
+      <p>지사 사진은 선택사항입니다. 등록하지 않아도 지사 정보는 정상적으로 표시됩니다.</p>
+    </div>
+    <div className="branch-image-editor-grid">
+      {([1, 2] as const).map(slot => <ImageSlotEditor key={slot} slug={slug} slot={slot}
+        imagePath={slot === 1 ? branch.imagePath : branch.imagePath2}
+        settings={slot === 1 ? { zoom: branch.imageZoom, positionX: branch.imagePositionX, positionY: branch.imagePositionY }
+          : { zoom: branch.image2Zoom, positionX: branch.image2PositionX, positionY: branch.image2PositionY }}
+        onUpload={file => onUpload(slot, file)} onDelete={() => onDelete(slot)} onSaveSettings={settings => onSaveSettings(slot, settings)} />)}
+    </div>
+  </section>;
 }
 
 function ImageSlotEditor({ slug, slot, imagePath, settings, onUpload, onDelete, onSaveSettings }: {
