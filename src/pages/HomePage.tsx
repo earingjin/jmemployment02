@@ -77,7 +77,8 @@ export function HomePage({ branches, benefitYear }: {
   const [reviewModal, setReviewModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
   const [pressModal, setPressModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
   const [mapModal, setMapModal] = useState<{ open: boolean; content: MapModalContent }>({
-    open: false, content: { title: '위치 안내', address: '', embedUrl: DEFAULT_MAP_EMBED_URL, linkUrl: '#', imagePath: null }
+    open: false, content: { title: '위치 안내', address: '', embedUrl: DEFAULT_MAP_EMBED_URL, linkUrl: '#', imagePath: null,
+      imagePath2: null, imageZoom: 1, imagePositionX: 50, imagePositionY: 50, image2Zoom: 1, image2PositionX: 50, image2PositionY: 50 }
   });
 
   useEffect(() => {
@@ -119,6 +120,13 @@ export function HomePage({ branches, benefitYear }: {
         title: name === '본사' ? '찾아오시는 길' : name + branchSuffix(name) + ' 찾아오시는 길',
         address: b.address,
         imagePath: b.imagePath,
+        imagePath2: b.imagePath2,
+        imageZoom: b.imageZoom,
+        imagePositionX: b.imagePositionX,
+        imagePositionY: b.imagePositionY,
+        image2Zoom: b.image2Zoom,
+        image2PositionX: b.image2PositionX,
+        image2PositionY: b.image2PositionY,
         embedUrl: mapEmbedUrl(b.address),
         linkUrl: (b.mapUrl && b.mapUrl.trim()) ? b.mapUrl.trim() : naverMapSearchUrl(b.address)
       }

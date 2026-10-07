@@ -1,6 +1,6 @@
 
 import { lazy, Suspense, useEffect, useState } from 'react';
-import type { BranchDirectoryRow as BranchRow, BranchImageRow } from './data/branchDirectory';
+import type { BranchDirectoryRow as BranchRow, BranchImageRow, BranchImageSlot } from './data/branchDirectory';
 import {
   createInitialBranches,
   type BranchMap,
@@ -55,6 +55,13 @@ function mergeRows(
       address: row.address,
       mapUrl: row.map_url,
       imagePath: row.image_path,
+      imagePath2: row.image_path_2,
+      imageZoom: row.image_zoom,
+      imagePositionX: row.image_position_x,
+      imagePositionY: row.image_position_y,
+      image2Zoom: row.image_2_zoom,
+      image2PositionX: row.image_2_position_x,
+      image2PositionY: row.image_2_position_y,
       region: row.region,
       hours: row.hours,
       published: row.published,
@@ -125,10 +132,13 @@ export default function App() {
     });
   };
 
-  const applySavedBranchImage = (saved: BranchImageRow): void => {
+  const applySavedBranchImage = (saved: BranchImageRow, slot: BranchImageSlot): void => {
     setBranches(current => {
       if (!current[saved.slug]) return current;
-      const updated = { ...current, [saved.slug]: { ...current[saved.slug], imagePath: saved.image_path } };
+      const image = slot === 1
+        ? { imagePath: saved.image_path, imageZoom: saved.image_zoom, imagePositionX: saved.image_position_x, imagePositionY: saved.image_position_y }
+        : { imagePath2: saved.image_path_2, image2Zoom: saved.image_2_zoom, image2PositionX: saved.image_2_position_x, image2PositionY: saved.image_2_position_y };
+      const updated = { ...current, [saved.slug]: { ...current[saved.slug], ...image } };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });

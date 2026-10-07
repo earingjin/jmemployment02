@@ -9,3 +9,8 @@
 .branch-image-buttons button:disabled { opacity: .6; cursor: not-allowed; }
 .branch-image-editor .branch-image-error { color: #fca5a5; }
 .branch-image-editor input:focus-visible, .branch-image-editor button:focus-visible { outline: 2px solid #93c5fd; outline-offset: 3px; }
+
+.branch-image-settings { max-width: 400px; margin: 20px 0; padding: 16px; border: 1px solid #64748b; border-radius: 8px; color: #e2e8f0; }
+.branch-image-settings input[type="range"] { width: 100%; }
+.branch-image-settings-save { margin-top: 16px; }
+.branch-image-settings-save:disabled { opacity: .6; cursor: not-allowed; }
