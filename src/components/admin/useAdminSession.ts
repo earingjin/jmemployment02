@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { AdminSessionError, getSupabaseAuthClient, loginAdmin, requestFixedAdminSession, type FixedAdminSession } from '../../lib/supabase';
+import { AdminSessionOperationGate, ADMIN_SESSION_STORAGE_KEY, canRenewAdminSession, persistAdminSession,
+  renewVerifiedAdminSession, SESSION_RENEWAL_FAILED, SESSION_RENEWAL_SUCCESS, sessionRemaining } from './adminSessionRenewal';
 
-const STORAGE_KEY = 'jmcareer_admin_session_id';
+const STORAGE_KEY = ADMIN_SESSION_STORAGE_KEY;
 const SERVICE_ERROR = '로그인 서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.';
 const EXPIRED = '관리자 세션이 만료되었습니다. 다시 로그인해주세요.';
 
@@ -15,6 +17,9 @@ export function useAdminSession() {
   const [loading, setLoading] = useState(true);
   const [serviceError, setServiceError] = useState('');
   const [remaining, setRemaining] = useState(0);
+  const [renewing, setRenewing] = useState(false);
+  const [renewalMessage, setRenewalMessage] = useState('');
+  const [operations] = useState(() => new AdminSessionOperationGate());
   const fixedRef = useRef<FixedAdminSession | null>(null);
   const authRef = useRef<Session | null>(null);
   const generation = useRef(0);
@@ -34,6 +39,7 @@ export function useAdminSession() {
     setSession(null);
     setLoading(true);
     setServiceError(message);
+    setRenewalMessage('');
     const task = (async () => {
       try {
         if (id) await requestFixedAdminSession('DELETE', id);
@@ -55,6 +61,8 @@ export function useAdminSession() {
   }, [client]);
 
   const restore = useCallback(async (auth: Session) => {
+    await operations.waitForRenewal();
+    if (!mounted.current || ending.current) return;
     const operation = ++generation.current;
     setLoading(true);
     try {
@@ -72,11 +80,11 @@ export function useAdminSession() {
     } catch {
       if (mounted.current && operation === generation.current) await logout(EXPIRED);
     }
-  }, [logout]);
+  }, [logout, operations]);
 
   const validate = useCallback(async () => {
     const fixed = fixedRef.current;
-    if (!fixed || checking.current || signingIn.current || ending.current) return;
+    if (!fixed || checking.current || signingIn.current || ending.current || operations.renewing) return;
     checking.current = true;
     const operation = generation.current;
     try {
@@ -88,7 +96,7 @@ export function useAdminSession() {
     } catch {
       if (mounted.current && operation === generation.current) await logout(EXPIRED);
     } finally { checking.current = false; }
-  }, [logout]);
+  }, [logout, operations]);
 
   useEffect(() => {
     mounted.current = true;
@@ -141,7 +149,9 @@ export function useAdminSession() {
   useEffect(() => {
     if (!fixedSession) return;
     const tick = () => {
-      const seconds = Math.max(0, Math.ceil((Date.parse(fixedSession.expires_at) - Date.now()) / 1000));
+      const current = fixedRef.current;
+      if (!current) return;
+      const seconds = sessionRemaining(current);
       setRemaining(seconds);
       if (seconds === 0) void logout(EXPIRED);
     };
@@ -173,7 +183,7 @@ export function useAdminSession() {
   }, [restore]);
 
   const login = async (username: string, password: string) => {
-    if (!client || signingIn.current || ending.current) throw new AdminSessionError(SERVICE_ERROR);
+    if (!client || signingIn.current || ending.current || operations.renewing) throw new AdminSessionError(SERVICE_ERROR);
     const operation = ++generation.current;
     signingIn.current = true;
     let authSucceeded = false;
@@ -206,6 +216,7 @@ export function useAdminSession() {
   };
 
   const getSaveAuthorization = async () => {
+    await operations.waitForRenewal();
     const operation = generation.current;
     const fixed = fixedRef.current;
     const expired = () => new AdminSessionError('관리자 세션이 만료되었습니다. 다시 로그인해 주세요.');
@@ -225,5 +236,43 @@ export function useAdminSession() {
     }
   };
 
-  return { session, fixedSession, loading, serviceError, remaining, available: !!client, login, logout, getSaveAuthorization };
+  const renewSession = async () => {
+    const previous = fixedRef.current;
+    if (!client || !mounted.current || signingIn.current || ending.current || !canRenewAdminSession(previous)) return;
+    if (operations.saving) { setRenewalMessage('저장 작업이 끝난 후 세션을 연장해주세요.'); return; }
+    const task = operations.renew(async () => {
+      const operation = ++generation.current;
+      const isCurrent = () => mounted.current && operation === generation.current && !ending.current;
+      const candidate: { session: FixedAdminSession | null } = { session: null };
+      let applied = false;
+      setRenewing(true);
+      setRenewalMessage('');
+      try {
+        const result = await renewVerifiedAdminSession(previous!, requestFixedAdminSession, isCurrent,
+          next => { candidate.session = next; });
+        if (!isCurrent()) return;
+        // Persist first: if browser storage is unavailable, do not leave an un-restorable new session active.
+        persistAdminSession(result.session, localStorage);
+        fixedRef.current = result.session;
+        setFixedSession(result.session);
+        setRemaining(sessionRemaining(result.session));
+        applied = result.renewed;
+        setRenewalMessage(result.renewed ? SESSION_RENEWAL_SUCCESS : SESSION_RENEWAL_FAILED);
+      } catch {
+        if (isCurrent()) await logout(EXPIRED);
+      } finally {
+        if (candidate.session && !applied) {
+          try { await requestFixedAdminSession('DELETE', candidate.session.id); } catch { /* never restore an uncertain session */ }
+        }
+        if (mounted.current) setRenewing(false);
+      }
+    });
+    if (task) await task;
+  };
+
+  const withSaveAuthorization = <T,>(save: (authorization: Awaited<ReturnType<typeof getSaveAuthorization>>) => Promise<T>) =>
+    operations.save(async () => save(await getSaveAuthorization()));
+
+  return { session, fixedSession, loading, serviceError, remaining, available: !!client, login, logout, getSaveAuthorization,
+    renewing, renewalMessage, renewSession, withSaveAuthorization };
 }
