@@ -54,14 +54,16 @@ null은 DB의 nullable 콘텐츠 필드에만 허용한다.
 
 | 필드 | 최대 길이/개수 |
 | --- | --- |
-| label/type_label | 120자 |
-| title/kind/big/source_name/headline/hero_type | 200자 |
-| sub/employer_amount/sub_label/hero_bottom | 500자 |
-| target/hero_note | 1000자 |
-| desc | 4000자 |
-| lines | 1~30개, 각 2000자 |
-| item_names | 1~20개, 각 200자 |
-| source_url | 2048자, HTTPS 절대 URL, 인증정보·공백·백슬래시·비표준 포트 금지 |
+| label/type_label | 100자 |
+| seeker_kind/seeker_target/seeker_big/seeker_sub/employer_target/employer_amount | 300자 |
+| seeker_desc/employer_desc | 2000자 |
+| source_name | 200자 |
+| title/hero_type | 150자 |
+| sub_label/headline/hero_bottom | 300자 |
+| hero_note | 500자 |
+| lines | 1~30개, 각 1000자 |
+| item_names | 1~10개, 각 150자 |
+| source_url | 2000자, HTTPS 절대 URL, 인증정보·공백·백슬래시·비표준 포트 금지 |
 | effective_date | 실제 존재하는 YYYY-MM-DD 날짜 또는 null |
 
 401=인증/고정 세션 무효, 403=관리자 아님, 400=계약/검증 위반,

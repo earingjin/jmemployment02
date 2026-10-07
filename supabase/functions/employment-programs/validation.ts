@@ -7,20 +7,20 @@ export class HttpError extends Error {
 
 type Rule = { max: number; nullable?: boolean; array?: boolean; count?: number; url?: boolean; date?: boolean };
 const programRules: Record<string, Rule> = {
-  label: { max: 120 },
-  seeker_kind: { max: 200, nullable: true }, seeker_target: { max: 1000, nullable: true },
-  seeker_big: { max: 200, nullable: true }, seeker_sub: { max: 500, nullable: true },
-  seeker_desc: { max: 4000, nullable: true }, employer_target: { max: 1000, nullable: true },
-  employer_amount: { max: 500, nullable: true }, employer_desc: { max: 4000, nullable: true },
+  label: { max: 100 },
+  seeker_kind: { max: 300, nullable: true }, seeker_target: { max: 300, nullable: true },
+  seeker_big: { max: 300, nullable: true }, seeker_sub: { max: 300, nullable: true },
+  seeker_desc: { max: 2000, nullable: true }, employer_target: { max: 300, nullable: true },
+  employer_amount: { max: 300, nullable: true }, employer_desc: { max: 2000, nullable: true },
   effective_date: { max: 10, nullable: true, date: true },
-  source_name: { max: 200, nullable: true }, source_url: { max: 2048, nullable: true, url: true },
+  source_name: { max: 200, nullable: true }, source_url: { max: 2000, nullable: true, url: true },
 };
-const sectionRules: Record<string, Rule> = { title: { max: 200 }, lines: { max: 2000, array: true, count: 30 } };
+const sectionRules: Record<string, Rule> = { title: { max: 150 }, lines: { max: 1000, array: true, count: 30 } };
 const benefitRules: Record<string, Rule> = {
-  type_label: { max: 120 }, item_names: { max: 200, array: true, count: 20 },
-  sub_label: { max: 500, nullable: true }, headline: { max: 200, nullable: true },
-  hero_note: { max: 1000, nullable: true }, hero_type: { max: 200 }, hero_bottom: { max: 500 },
-  lines: { max: 2000, array: true, count: 30 },
+  type_label: { max: 100 }, item_names: { max: 150, array: true, count: 10 },
+  sub_label: { max: 300, nullable: true }, headline: { max: 300, nullable: true },
+  hero_note: { max: 500, nullable: true }, hero_type: { max: 150 }, hero_bottom: { max: 300 },
+  lines: { max: 1000, array: true, count: 30 },
 };
 
 export function isRecord(value: unknown): value is Record<string, unknown> {

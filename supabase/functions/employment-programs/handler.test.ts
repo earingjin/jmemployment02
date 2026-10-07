@@ -143,11 +143,11 @@ test("structure/design/audit fields, unknown properties and prototype keys are r
 });
 
 test("plain-text lengths, array counts, types, HTTPS URLs and dates are strictly checked", () => {
-  for (const value of [null, 123, true, [], {}, "", " ", "x".repeat(121), "<script>alert(1)</script>", "javascript:alert(1)", "```css", "bad\u0000text"]) {
+  for (const value of [null, 123, true, [], {}, "", " ", "x".repeat(101), "<script>alert(1)</script>", "javascript:alert(1)", "```css", "bad\u0000text"]) {
     assert.throws(() => validatePatch({ ...programPatch, patch: { label: value } }), HttpError);
   }
   const section = { program_id: "employment-support", target: "section", section_key: "eligibility" };
-  for (const lines of [[], Array(31).fill("x"), [123], [null], ["x".repeat(2001)], "not-array"]) {
+  for (const lines of [[], Array(31).fill("x"), [123], [null], ["x".repeat(1001)], "not-array"]) {
     assert.throws(() => validatePatch({ ...section, patch: { lines } }), HttpError);
   }
   assert.doesNotThrow(() => validatePatch({ ...section, patch: { lines: Array(30).fill("안내") } }));
@@ -158,6 +158,32 @@ test("plain-text lengths, array counts, types, HTTPS URLs and dates are strictly
   for (const date of ["0000-01-01", "2026-02-29", "2026-04-31", "2026-13-01", "2026-1-1"]) {
     assert.throws(() => validatePatch({ ...programPatch, patch: { effective_date: date } }), HttpError);
   }
+});
+
+test("DB content limits accept the boundary and reject one character or item beyond it", () => {
+  const cases = [
+    { target: "program", limits: { label: 100, seeker_kind: 300, seeker_target: 300, seeker_big: 300, seeker_sub: 300, seeker_desc: 2000, employer_target: 300, employer_amount: 300, employer_desc: 2000, source_name: 200, source_url: 2000 } },
+    { target: "section", section_key: "eligibility", limits: { title: 150 } },
+    { target: "benefit-group", benefit_key: "type-1", limits: { type_label: 100, sub_label: 300, headline: 300, hero_note: 500, hero_type: 150, hero_bottom: 300 } },
+  ];
+  for (const { limits, ...selector } of cases) {
+    for (const [field, max] of Object.entries(limits)) {
+      const value = field === "source_url" ? "https://example.com/" + "x".repeat(max - 20) : "x".repeat(max);
+      const body = { program_id: "employment-support", ...selector, patch: { [field]: value } };
+      assert.doesNotThrow(() => validatePatch(body), field);
+      assert.throws(() => validatePatch({ ...body, patch: { [field]: value + "x" } }), HttpError, field);
+    }
+  }
+  for (const selector of [{ target: "section", section_key: "eligibility" }, { target: "benefit-group", benefit_key: "type-1" }]) {
+    const body = { program_id: "employment-support", ...selector };
+    assert.doesNotThrow(() => validatePatch({ ...body, patch: { lines: Array(30).fill("x".repeat(1000)) } }));
+    assert.throws(() => validatePatch({ ...body, patch: { lines: Array(31).fill("x") } }), HttpError);
+    assert.throws(() => validatePatch({ ...body, patch: { lines: ["x".repeat(1001)] } }), HttpError);
+  }
+  const benefit = { program_id: "employment-support", target: "benefit-group", benefit_key: "type-1" };
+  assert.doesNotThrow(() => validatePatch({ ...benefit, patch: { item_names: Array(10).fill("x".repeat(150)) } }));
+  assert.throws(() => validatePatch({ ...benefit, patch: { item_names: Array(11).fill("x") } }), HttpError);
+  assert.throws(() => validatePatch({ ...benefit, patch: { item_names: ["x".repeat(151)] } }), HttpError);
 });
 
 test("JSON body size/content type and methods are constrained", async () => {
