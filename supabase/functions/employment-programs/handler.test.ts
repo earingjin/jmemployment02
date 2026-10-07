@@ -78,6 +78,26 @@ test("GET returns allowlisted public fields without administrator authentication
   assert.equal(response.headers.get("Cache-Control"), "no-store");
 });
 
+test("GET full Supabase URL accepts no query or a known program and rejects arbitrary queries", async () => {
+  const f = fixture();
+  const ids = ["employment-support", "job-leap", "future-experience", "field-training"];
+  f.tables.employment_programs = ids.map(id => ({ id, label: id }));
+  const base = "https://mpmgwkukrdgmzvoiwwcm.supabase.co/functions/v1/employment-programs";
+  for (const suffix of ["", "?"]) {
+    const response = await f.handler(new Request(base + suffix));
+    assert.equal(response.status, 200);
+    assert.deepEqual((await response.json()).programs.map((row: Row) => row.id), ids);
+  }
+  const filtered = await f.handler(new Request(base + "?program_id=employment-support"));
+  assert.equal(filtered.status, 200);
+  assert.deepEqual((await filtered.json()).programs.map((row: Row) => row.id), ["employment-support"]);
+  for (const query of ["program_id=unknown", "program_id=", "select=*", "filter=id.eq.employment-support", "order=id", "program_id=employment-support&select=*", "program_id=employment-support&program_id=job-leap"]) {
+    assert.equal((await f.handler(new Request(base + "?" + query))).status, 400, query);
+  }
+  assert.equal(f.authCalls(), 0);
+  assert.equal(f.writes.length, 0);
+});
+
 test("GET query is limited to known programs and cannot change projection", async () => {
   const f = fixture();
   for (const query of ["program_id=unknown", "select=*", "program_id=employment-support&program_id=job-leap"]) {
