@@ -2,12 +2,19 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { BranchImageSlot, BranchImageSettings } from '../../data/branchDirectory';
 import { BranchImageEditor } from './BranchImageEditor';
 import { ADMIN_BRANCHES, BRANCH_REGIONS, branchSuffix, type Branch, type BranchMap } from '../../data/branches';
+import './AdminPage.css';
 
 export type BranchPatch = Pick<Branch, 'phone' | 'address' | 'hours' | 'region'>;
 
-// 관리자 대시보드 (원본 #adminPage)
-// 원본과 동일하게 수정 내용은 현재 브라우저 메모리에만 반영된다(저장소·서버·인증 없음, 새로고침 시 초기화).
-export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranch, onSaveBenefitYear, onBack, accountActions, onUploadImage, onDeleteImage, onSaveImageSettings }: {
+const managementTabs = [
+  { id: 'branch', label: '지사 관리' },
+  { id: 'programs', label: '고용지원사업 관리' },
+  { id: 'common', label: '공통 설정' },
+  { id: 'account', label: '계정 관리' },
+] as const;
+type ManagementTab = typeof managementTabs[number]['id'];
+
+export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranch, onSaveBenefitYear, onBack, sessionActions, accountActions, onUploadImage, onDeleteImage, onSaveImageSettings }: {
   visible: boolean;
   openSeq: number; // 관리자 화면을 열 때마다 증가 (원본 showAdmin()의 목록·편집기 재렌더링 시점)
   branches: BranchMap;
@@ -15,13 +22,14 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
   onSaveBranch: (slug: string, patch: BranchPatch) => Promise<void>;
   onSaveBenefitYear: (year: string) => void;
   onBack: () => void;
+  sessionActions?: ReactNode;
   accountActions?: ReactNode;
   onUploadImage: (slug: string, slot: BranchImageSlot, file: File) => Promise<void>;
   onDeleteImage: (slug: string, slot: BranchImageSlot) => Promise<void>;
   onSaveImageSettings: (slug: string, slot: BranchImageSlot, settings: BranchImageSettings) => Promise<void>;
 }) {
   const [activeSlug, setActiveSlug] = useState('본사');
-  const [adminMode, setAdminMode] = useState<'branch' | 'common'>('branch');
+  const [adminMode, setAdminMode] = useState<ManagementTab>('branch');
   const [search, setSearch] = useState('');
   // 원본은 renderBranchList() 호출 시점에만 목록의 권역 표시를 갱신했다(저장 직후에는 갱신하지 않음). 그 시점을 보존한다.
   const [listRegions, setListRegions] = useState(() => regionsOf(branches));
@@ -36,9 +44,11 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
     setBranchEditorSeq(s => s + 1);
   }
 
-  const changeMode = (mode: 'branch' | 'common') => {
+  const changeMode = (mode: ManagementTab) => {
+    if (mode === adminMode) return;
     setAdminMode(mode);
-    if (mode === 'branch') setBranchEditorSeq(s => s + 1); else setCommonEditorSeq(s => s + 1);
+    if (mode === 'branch') setBranchEditorSeq(s => s + 1);
+    if (mode === 'common') setCommonEditorSeq(s => s + 1);
   };
 
   const q = search.trim();
@@ -56,10 +66,6 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
           </div>
           <div style={{ padding: '12px' }}>
             <button onClick={onBack} style={{ width: '100%', background: '#334155', color: '#FFF', border: 'none', padding: '10px', borderRadius: '6px', fontWeight: 700, cursor: 'pointer' }}>← 사이트로 돌아가기</button>
-          </div>
-          <div className="admin-mode-switch">
-            <button className={'admin-mode-btn' + (adminMode === 'branch' ? ' active' : '')} id="modeBranchBtn" onClick={() => changeMode('branch')}>지사별 관리</button>
-            <button className={'admin-mode-btn' + (adminMode === 'common' ? ' active' : '')} id="modeCommonBtn" onClick={() => changeMode('common')}>공통 콘텐츠</button>
           </div>
           <div id="branchListWrap" style={{ display: adminMode === 'branch' ? 'block' : 'none' }}>
             <div className="admin-search-wrap">
@@ -83,12 +89,45 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
         </div>
 
         <div className="admin-main">
-          {accountActions}
-          <div id="branchEditorView" style={{ display: adminMode === 'branch' ? 'block' : 'none' }}>
+          <header className="admin-management-header">
+            <h1>본사 통합 관리자</h1>
+            {sessionActions}
+          </header>
+          <div className="admin-management-tabs" role="tablist" aria-label="관리자 기능">
+            {managementTabs.map((tab, index) => (
+              <button key={tab.id} type="button" role="tab" id={`admin-tab-${tab.id}`}
+                aria-selected={adminMode === tab.id} aria-controls={`admin-panel-${tab.id}`}
+                tabIndex={adminMode === tab.id ? 0 : -1}
+                className={'admin-mode-btn' + (adminMode === tab.id ? ' active' : '')}
+                onClick={() => changeMode(tab.id)}
+                onKeyDown={event => {
+                  let next: number;
+                  if (event.key === 'ArrowRight') next = (index + 1) % managementTabs.length;
+                  else if (event.key === 'ArrowLeft') next = (index + managementTabs.length - 1) % managementTabs.length;
+                  else if (event.key === 'Home') next = 0;
+                  else if (event.key === 'End') next = managementTabs.length - 1;
+                  else return;
+                  event.preventDefault();
+                  changeMode(managementTabs[next].id);
+                  document.getElementById(`admin-tab-${managementTabs[next].id}`)?.focus();
+                }}>{tab.label}</button>
+            ))}
+          </div>
+          <div id="admin-panel-branch" role="tabpanel" aria-labelledby="admin-tab-branch" hidden={adminMode !== 'branch'}>
             <BranchEditor key={`${activeSlug}-${branchEditorSeq}`} slug={activeSlug} branch={branches[activeSlug]} onSave={patch => onSaveBranch(activeSlug, patch)} onUploadImage={(slot, file) => onUploadImage(activeSlug, slot, file)} onDeleteImage={slot => onDeleteImage(activeSlug, slot)} onSaveImageSettings={(slot, settings) => onSaveImageSettings(activeSlug, slot, settings)} />
           </div>
-          <div id="commonEditorView" style={{ display: adminMode === 'common' ? 'block' : 'none' }}>
+          <div id="admin-panel-programs" role="tabpanel" aria-labelledby="admin-tab-programs" hidden={adminMode !== 'programs'}>
+            <div className="admin-card">
+              <h2 className="admin-card-title">고용지원사업 관리</h2>
+              <p className="admin-management-description">향후 고용지원사업의 정책 내용을 관리하는 영역입니다. 정책 편집 기능은 준비 중입니다.</p>
+            </div>
+          </div>
+          <div id="admin-panel-common" role="tabpanel" aria-labelledby="admin-tab-common" hidden={adminMode !== 'common'}>
             {commonEditorSeq > 0 && <CommonEditor key={commonEditorSeq} benefitYear={benefitYear} onSave={onSaveBenefitYear} />}
+          </div>
+          <div id="admin-panel-account" role="tabpanel" aria-labelledby="admin-tab-account" hidden={adminMode !== 'account'}>
+            <h2 className="admin-card-title">계정 관리</h2>
+            {adminMode === 'account' && accountActions}
           </div>
         </div>
       </div>
