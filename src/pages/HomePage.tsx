@@ -77,7 +77,7 @@ export function HomePage({ branches, benefitYear }: {
   const [reviewModal, setReviewModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
   const [pressModal, setPressModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null });
   const [mapModal, setMapModal] = useState<{ open: boolean; content: MapModalContent }>({
-    open: false, content: { title: '위치 안내', address: '', embedUrl: DEFAULT_MAP_EMBED_URL, linkUrl: '#' }
+    open: false, content: { title: '위치 안내', address: '', embedUrl: DEFAULT_MAP_EMBED_URL, linkUrl: '#', imagePath: null }
   });
 
   useEffect(() => {
@@ -118,6 +118,7 @@ export function HomePage({ branches, benefitYear }: {
       content: {
         title: name === '본사' ? '찾아오시는 길' : name + branchSuffix(name) + ' 찾아오시는 길',
         address: b.address,
+        imagePath: b.imagePath,
         embedUrl: mapEmbedUrl(b.address),
         linkUrl: (b.mapUrl && b.mapUrl.trim()) ? b.mapUrl.trim() : naverMapSearchUrl(b.address)
       }

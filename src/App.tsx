@@ -1,6 +1,6 @@
 
 import { lazy, Suspense, useEffect, useState } from 'react';
-import type { BranchDirectoryRow as BranchRow } from './data/branchDirectory';
+import type { BranchDirectoryRow as BranchRow, BranchImageRow } from './data/branchDirectory';
 import {
   createInitialBranches,
   type BranchMap,
@@ -54,6 +54,7 @@ function mergeRows(
       phone: row.phone,
       address: row.address,
       mapUrl: row.map_url,
+      imagePath: row.image_path,
       region: row.region,
       hours: row.hours,
       published: row.published,
@@ -117,14 +118,20 @@ export default function App() {
   }, []);
 
   const applySavedBranch = (saved: BranchRow): void => {
-    const updated = mergeRows(branches, [saved]);
+    setBranches(current => {
+      const updated = mergeRows(current, [saved]);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  };
 
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updated)
-    );
-
-    setBranches(updated);
+  const applySavedBranchImage = (saved: BranchImageRow): void => {
+    setBranches(current => {
+      if (!current[saved.slug]) return current;
+      const updated = { ...current, [saved.slug]: { ...current[saved.slug], imagePath: saved.image_path } };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
   if (pathname === '/admin') {
@@ -136,6 +143,7 @@ export default function App() {
           branches={branches}
           benefitYear={benefitYear}
           onBranchSaved={applySavedBranch}
+          onBranchImageSaved={applySavedBranchImage}
           onSaveBenefitYear={setBenefitYear}
           onBack={() => {
             window.history.pushState({}, '', '/');
