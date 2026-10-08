@@ -3,20 +3,22 @@ import { createPortal } from 'react-dom';
 import { BENEFIT_CONTENT_FIELDS, loadEmploymentProgram,
   POLICY_SOURCE_FIELDS, PROGRAM_CONTENT_FIELDS, PROGRAM_LOAD_ERROR, SECTION_CONTENT_FIELDS,
   type ContentField, type ContentValues, type EmploymentContentRow, type EmploymentPatchRequest, type EmploymentProgramData,
-  type EmploymentProgramId, type EmploymentSelector } from '../../data/employmentPrograms';
+  type EmploymentProgramId, type EmploymentProgramRow, type EmploymentSelector } from '../../data/employmentPrograms';
 import { addEmploymentSectionLine, deleteEmploymentSectionLine, SECTION_MIN_LINES, SECTION_MAX_LINES, sectionLinesError,
   buildEmploymentPatch, canLeaveEmploymentEditor, createEmploymentEditorState,
   editEmploymentField, employmentEditorDirty, failedEmploymentEditorState, savedEmploymentEditorState,
   type EmploymentEditStatus } from './employmentEditorState';
 import './EmploymentProgramsEditor.css';
 import { buildEmploymentPreview, type EmploymentPreviewData } from './employmentPreview';
+import { DEFAULT_BENEFIT_YEAR } from '../../data/content';
+import { customerFieldScreens, customerFieldNotice, CUSTOMER_PREVIEW_SCREENS, type CustomerEditArea } from './employmentCustomerImpact';
 import { EmploymentProgramPreview } from './EmploymentProgramPreview';
 import { EmploymentProgramNavigation, EmploymentQuickNavigation, selectEmploymentProgram } from './EmploymentProgramNavigation';
 
 export type SaveEmploymentContent = (request: EmploymentPatchRequest) => Promise<EmploymentContentRow>;
 
-export function EmploymentProgramsEditor({ onSave, leaveGuard, navigationTarget }: {
-  onSave: SaveEmploymentContent; leaveGuard: RefObject<() => boolean>; navigationTarget: HTMLElement | null;
+export function EmploymentProgramsEditor({ onSave, leaveGuard, navigationTarget, benefitYear = DEFAULT_BENEFIT_YEAR }: {
+  benefitYear?: string; onSave: SaveEmploymentContent; leaveGuard: RefObject<() => boolean>; navigationTarget: HTMLElement | null;
 }) {
   const [selected, setSelected] = useState<EmploymentProgramId>('employment-support');
   const statuses = useRef(new Map<string, EmploymentEditStatus>());
@@ -46,19 +48,19 @@ export function EmploymentProgramsEditor({ onSave, leaveGuard, navigationTarget 
   return (
     <section className="employment-cms" aria-labelledby="employment-cms-title">
       <h2 id="employment-cms-title" className="admin-card-title">고용지원사업 관리</h2>
-      <p className="employment-cms-note">현재 저장된 정책 내용을 편집합니다. 이번 단계의 변경사항은 고객 웹사이트에 반영되지 않습니다.</p>
+      <p className="employment-cms-note">저장한 내용은 고객 웹사이트에 즉시 반영됩니다. 이미 열린 고객 화면에서는 새로고침 후 확인해 주세요. 공개 데이터 조회에 실패하면 기존 안내가 표시됩니다.</p>
       {navigationTarget && createPortal(<EmploymentProgramNavigation selected={selected} onSelect={select} />, navigationTarget)}
       {summary.saving ? <p className="employment-cms-note" role="status">저장 중에는 다른 사업이나 관리 탭으로 이동할 수 없습니다.</p>
         : summary.dirty && <p className="employment-cms-note" role="status">저장하지 않은 변경사항이 있습니다.</p>}
       <div id="employment-program-panel" role="region" aria-labelledby={`employment-tab-${selected}`}>
-        <EmploymentProgramWorkspace key={selected} id={selected} onSave={onSave} reportStatus={reportStatus} />
+        <EmploymentProgramWorkspace key={selected} id={selected} benefitYear={benefitYear} onSave={onSave} reportStatus={reportStatus} />
       </div>
     </section>
   );
 }
 
-function EmploymentProgramWorkspace({ id, onSave, reportStatus }: {
-  id: EmploymentProgramId; onSave: SaveEmploymentContent;
+function EmploymentProgramWorkspace({ id, onSave, reportStatus, benefitYear }: {
+  id: EmploymentProgramId; benefitYear: string; onSave: SaveEmploymentContent;
   reportStatus: (key: string, status?: EmploymentEditStatus) => void;
 }) {
   const [data, setData] = useState<EmploymentProgramData | null>(null);
@@ -93,32 +95,32 @@ function EmploymentProgramWorkspace({ id, onSave, reportStatus }: {
       <div className="employment-cms-preview-toolbar">
         <h3 className="employment-cms-program-name">{data.program.label}</h3>
         <button ref={previewButton} type="button" className="employment-cms-line-button"
-          onClick={() => setPreview(buildEmploymentPreview(data, drafts.current))}>고객 화면 미리보기</button>
+          onClick={() => setPreview(buildEmploymentPreview(data, drafts.current, benefitYear))}>고객 화면 미리보기</button>
       </div>
       <EmploymentQuickNavigation sections={data.sections} />
-      <EmploymentRowEditor row={data.program} fields={PROGRAM_CONTENT_FIELDS} selector={{ target: 'program', program_id: id }}
+      <EmploymentRowEditor program={data.program} row={data.program} fields={PROGRAM_CONTENT_FIELDS} selector={{ target: 'program', program_id: id }}
         title="기본 정보" saveLabel="기본 정보 저장" areaId="program" onSave={onSave} onSaved={saved} reportStatus={reportStatus} reportDraft={reportDraft} />
       <h3 className="admin-card-title employment-navigation-target" id="employment-group-benefits" tabIndex={-1}>지원금 안내</h3>
       {data.benefits.length === 0 && <p className="employment-cms-note">현재 등록된 지원금 안내가 없습니다.</p>}
-      {data.benefits.map((benefit, index) => <EmploymentRowEditor key={benefit.benefit_key} row={benefit} fields={BENEFIT_CONTENT_FIELDS}
+      {data.benefits.map((benefit, index) => <EmploymentRowEditor program={data.program} key={benefit.benefit_key} row={benefit} fields={BENEFIT_CONTENT_FIELDS}
         selector={{ target: 'benefit-group', program_id: id, benefit_key: benefit.benefit_key }}
         title={`지원금 안내 ${index + 1} · ${benefit.type_label}`} saveLabel="이 지원금 안내 저장" areaId={`benefit-${index}`}
         onSave={onSave} onSaved={saved} reportStatus={reportStatus} reportDraft={reportDraft} />)}
       <h3 className="admin-card-title employment-navigation-target" id="employment-group-details" tabIndex={-1}>상세 안내</h3>
       {data.sections.length === 0 && <p className="employment-cms-note">현재 등록된 상세 안내가 없습니다.</p>}
-      {data.sections.map((section, index) => <EmploymentRowEditor key={section.section_key} row={section} fields={SECTION_CONTENT_FIELDS}
+      {data.sections.map((section, index) => <EmploymentRowEditor program={data.program} key={section.section_key} row={section} fields={SECTION_CONTENT_FIELDS}
         selector={{ target: 'section', program_id: id, section_key: section.section_key }}
         title={section.title} saveLabel="이 상세 안내 저장" areaId={`section-${index}`}
         onSave={onSave} onSaved={saved} reportStatus={reportStatus} reportDraft={reportDraft} />)}
-      <EmploymentRowEditor row={data.program} fields={POLICY_SOURCE_FIELDS} selector={{ target: 'program', program_id: id }}
+      <EmploymentRowEditor program={data.program} row={data.program} fields={POLICY_SOURCE_FIELDS} selector={{ target: 'program', program_id: id }}
         title="정책 기준 정보" saveLabel="정책 기준 정보 저장" areaId="source" onSave={onSave} onSaved={saved} reportStatus={reportStatus} reportDraft={reportDraft} />
       {preview && <EmploymentProgramPreview data={preview} onClose={() => setPreview(null)} returnFocus={previewButton} />}
     </>
   );
 }
 
-function EmploymentRowEditor({ row, fields, selector, title, saveLabel, areaId, onSave, onSaved, reportStatus, reportDraft }: {
-  row: EmploymentContentRow; fields: ContentField[]; selector: EmploymentSelector;
+function EmploymentRowEditor({ program, row, fields, selector, title, saveLabel, areaId, onSave, onSaved, reportStatus, reportDraft }: {
+  program: EmploymentProgramRow; row: EmploymentContentRow; fields: ContentField[]; selector: EmploymentSelector;
   title: string; saveLabel: string; areaId: string; onSave: SaveEmploymentContent;
   onSaved: (row: EmploymentContentRow) => void; reportStatus: (key: string, status?: EmploymentEditStatus) => void;
   reportDraft: (key: string, draft: ContentValues) => void;
@@ -126,6 +128,13 @@ function EmploymentRowEditor({ row, fields, selector, title, saveLabel, areaId, 
   const [state, setState] = useState(() => createEmploymentEditorState(row, fields));
   const pending = useRef(false);
   const dirty = employmentEditorDirty(state);
+  const area: CustomerEditArea = areaId === 'source' ? 'source' : selector.target === 'program' ? 'program' : selector.target === 'section' ? 'section' : 'benefit';
+  const baselineContext = { program, benefit: 'benefit_key' in row ? row : undefined };
+  const draftContext = { program: area === 'program' ? { ...program, ...state.draft } as EmploymentProgramRow : program,
+    benefit: 'benefit_key' in row ? { ...row, ...state.draft } as typeof row : undefined };
+  const locations = new Set(fields.flatMap(field => [
+    ...customerFieldScreens(area, field.name, baselineContext), ...customerFieldScreens(area, field.name, draftContext, baselineContext),
+  ]));
   const linesError = selector.target === 'section' ? sectionLinesError(state.draft.lines) : '';
   useEffect(() => { reportDraft(areaId, state.draft); }, [areaId, state.draft, reportDraft]);
   useEffect(() => { reportStatus(areaId, { dirty, saving: state.saving }); }, [areaId, dirty, state.saving, reportStatus]);
@@ -151,6 +160,9 @@ function EmploymentRowEditor({ row, fields, selector, title, saveLabel, areaId, 
     <form id={`employment-area-${areaId}`} tabIndex={-1} className="admin-card employment-cms-card employment-navigation-target" aria-labelledby={`${areaId}-heading`} aria-busy={state.saving}
       onSubmit={event => { event.preventDefault(); void save(); }}>
       <h4 id={`${areaId}-heading`} className="admin-card-title">{title}</h4>
+      <p className="employment-cms-note"><strong>고객 반영 위치: </strong>
+        {locations.size ? CUSTOMER_PREVIEW_SCREENS.filter(screen => locations.has(screen.id)).map(screen => screen.label).join(' · ') : '현재 고객 화면에 직접 표시되지 않습니다.'}
+      </p>
       <div className="employment-cms-fields">
         {fields.map((field, fieldIndex) => {
           const value = state.draft[field.name];
@@ -160,7 +172,7 @@ function EmploymentRowEditor({ row, fields, selector, title, saveLabel, areaId, 
             {inputs.map((input, index) => {
               const inputId = `${areaId}-field-${fieldIndex}-${index}`;
               const label = field.label + (field.array ? ` ${index + 1}` : '') + (field.nullable ? ' (선택)' : '');
-              const shared = { id: inputId, className: 'admin-input', value: input,
+              const shared = { id: inputId, className: 'admin-input', value: input, 'aria-describedby': areaId + '-field-' + fieldIndex + '-location',
                 maxLength: field.max, disabled: state.saving,
                 onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => edit(field, event.target.value, field.array ? index : undefined) };
               return <div key={index} className="employment-cms-input-wrap">
@@ -174,6 +186,9 @@ function EmploymentRowEditor({ row, fields, selector, title, saveLabel, areaId, 
                 </div>
               </div>;
             })}
+            <p id={areaId + '-field-' + fieldIndex + '-location'} className="employment-cms-note">
+              {customerFieldNotice(area, field.name, draftContext, baselineContext)}
+            </p>
             {editableLines && <div className="employment-cms-line-actions">
               <button type="button" className="employment-cms-line-button" disabled={state.saving || inputs.length >= SECTION_MAX_LINES}
                 onClick={() => setState(current => addEmploymentSectionLine(current))}>+ 내용 줄 추가</button>
@@ -186,6 +201,7 @@ function EmploymentRowEditor({ row, fields, selector, title, saveLabel, areaId, 
         <span className="employment-cms-note">{dirty ? '수정됨 · 저장 필요' : '변경 없음'}</span>
         <button type="submit" className="admin-save-btn" disabled={!dirty || state.saving || !!linesError}>{state.saving ? '저장 중...' : saveLabel}</button>
       </div>
+      <p className="employment-cms-note">저장한 내용은 고객 웹사이트에 바로 반영됩니다. 저장 전 고객 화면 미리보기에서 변경 내용을 확인해 주세요.</p>
       {dirty && linesError && <p className="employment-cms-error" role="alert">{linesError}</p>}
       {state.notice && <p className="employment-cms-success" role="status">{state.notice}</p>}
       {state.error && <p className="employment-cms-error" role="alert">{state.error}</p>}

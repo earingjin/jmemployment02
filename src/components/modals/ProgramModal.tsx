@@ -1,20 +1,21 @@
 import { ProgramDetailBlocks } from '../ProgramDetailBlocks';
-import { findProgram } from '../../data/programs';
+import { PROGRAMS, type Program } from '../../data/programs';
 import { ModalOverlay } from '../common/ModalOverlay';
 
 export type Audience = 'seeker' | 'employer';
 
 // 프로그램 상세 모달 (원본 openProgramDetail)
 // programId가 null이면 원본 초기 상태(제목 '국민취업지원제도', 본문 비어 있음)
-export function ProgramModal({ open, programId, audience, onClose, onOpenDetail, onConsult }: {
+export function ProgramModal({ open, programId, audience, programs = PROGRAMS, onClose, onOpenDetail, onConsult }: {
   open: boolean;
   programId: string | null;
   audience: Audience;
+  programs?: Program[];
   onClose: () => void;
   onOpenDetail: (programId: string, audience: Audience) => void;
   onConsult: () => void;
 }) {
-  const p = programId ? findProgram(programId) : undefined;
+  const p = programId ? programs.find(program => program.id === programId) : undefined;
   const title = p ? p.label + (audience === 'employer' ? ' · 기업 지원금' : '') : '국민취업지원제도';
 
   let summary = null;

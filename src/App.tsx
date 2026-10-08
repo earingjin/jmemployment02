@@ -7,6 +7,7 @@ import {
 } from './data/branches';
 import { DEFAULT_BENEFIT_YEAR } from './data/content';
 import { HomePage } from './pages/HomePage';
+import { getCustomerProgramFallback, loadCustomerProgramsWithFallback } from './data/customerProgramFallback';
 
 const AdminRoute = lazy(() =>
   import('./components/admin/AdminRoute').then(module => ({ default: module.AdminRoute }))
@@ -74,6 +75,22 @@ function mergeRows(
 
 export default function App() {
   const [branches, setBranches] = useState(loadBranches);
+  const [customerPrograms, setCustomerPrograms] = useState(getCustomerProgramFallback);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    // Defer one microtask so StrictMode's discarded effect never starts a second GET.
+    void Promise.resolve().then(async () => {
+      if (controller.signal.aborted) return;
+      try {
+        const data = await loadCustomerProgramsWithFallback(undefined, controller.signal);
+        if (!controller.signal.aborted) setCustomerPrograms(data);
+      } catch {
+        // Cancellation keeps the initial static snapshot and never updates an unmounted App.
+      }
+    });
+    return () => controller.abort();
+  }, []);
   const [benefitYear, setBenefitYear] =
     useState(DEFAULT_BENEFIT_YEAR);
 
@@ -165,5 +182,5 @@ export default function App() {
     );
   }
 
-  return <HomePage branches={branches} benefitYear={benefitYear} />;
+  return <HomePage branches={branches} benefitYear={benefitYear} customerPrograms={customerPrograms} />;
 }

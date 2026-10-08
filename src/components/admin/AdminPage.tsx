@@ -125,7 +125,7 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
             <BranchEditor key={`${activeSlug}-${branchEditorSeq}`} slug={activeSlug} branch={branches[activeSlug]} onSave={patch => onSaveBranch(activeSlug, patch)} onUploadImage={(slot, file) => onUploadImage(activeSlug, slot, file)} onDeleteImage={slot => onDeleteImage(activeSlug, slot)} onSaveImageSettings={(slot, settings) => onSaveImageSettings(activeSlug, slot, settings)} />
           </div>
           <div id="admin-panel-programs" role="tabpanel" aria-labelledby="admin-tab-programs" hidden={adminMode !== 'programs'}>
-            {adminMode === 'programs' && <EmploymentProgramsEditor onSave={onSaveProgramContent} leaveGuard={programLeaveGuard} navigationTarget={programNavigationTarget} />}
+            {adminMode === 'programs' && <EmploymentProgramsEditor benefitYear={benefitYear} onSave={onSaveProgramContent} leaveGuard={programLeaveGuard} navigationTarget={programNavigationTarget} />}
           </div>
           <div id="admin-panel-common" role="tabpanel" aria-labelledby="admin-tab-common" hidden={adminMode !== 'common'}>
             {commonEditorSeq > 0 && <CommonEditor key={commonEditorSeq} benefitYear={benefitYear} onSave={onSaveBenefitYear} />}

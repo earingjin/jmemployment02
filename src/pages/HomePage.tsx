@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_MAP_EMBED_URL, PUBLIC_BRANCH, branchSuffix, mapEmbedUrl, naverMapSearchUrl, type BranchMap } from '../data/branches';
 import { PRESS_NEWS, REVIEWS } from '../data/content';
-import { findProgram } from '../data/programs';
+import type { CustomerProgramData } from '../data/customerProgramAdapter';
 import { ConsultationSection } from '../components/home/ConsultationSection';
 import { openConsultationForm } from '../data/consultation';
 import { LEGAL_CONTENT, type LegalContentId } from '../data/legal';
@@ -33,9 +33,10 @@ const currentView = () => viewFromPath(window.location.pathname);
 const pushPath = (path: string) => { if (window.location.pathname !== path) window.history.pushState({}, '', path); };
 
 // 공개 사이트 전체 (원본 #publicPage)
-export function HomePage({ branches, benefitYear }: {
+export function HomePage({ branches, benefitYear, customerPrograms }: {
   branches: BranchMap;
   benefitYear: string;
+  customerPrograms: CustomerProgramData;
 }) {
   const [view, setView] = useState<View>(currentView);
   const publicRef = useRef<HTMLDivElement>(null);
@@ -103,7 +104,7 @@ export function HomePage({ branches, benefitYear }: {
   };
 
   const openProgramDetail = (programId: string, audience: Audience = 'seeker') => {
-    if (!findProgram(programId)) return;
+    if (!customerPrograms.programs.some(program => program.id === programId)) return;
     setProgramModal({ open: true, programId, audience });
   };
   const closeProgramDetail = () => setProgramModal(m => ({ ...m, open: false }));
@@ -138,12 +139,12 @@ export function HomePage({ branches, benefitYear }: {
       <Header view={view} onNavigate={navigate} onConsult={goToConsult} />
 
       <div className={'page' + (view !== 'home' ? ' sub-mode' : ' mobile-home')}>
-        <EmployerView active={view === 'employer'} benefitYear={benefitYear} onDetail={id => openProgramDetail(id, 'employer')} onConsult={goToConsult} />
+        <EmployerView programs={customerPrograms.programs} active={view === 'employer'} benefitYear={benefitYear} onDetail={id => openProgramDetail(id, 'employer')} onConsult={goToConsult} />
         <BranchDirectoryView active={view === 'branch'} branches={branches} region={bdRegion} onRegion={setBdRegion} onOpenMap={openBranchMap} />
         {view === 'smartcare' && <SmartCarePage onBack={goHome} onConsult={goToConsult} />}
-        {isProgramView(view) && <ProgramDetailPage key={view} programId={view} onBack={goHome} onConsult={goToConsult} />}
+        {isProgramView(view) && <ProgramDetailPage programs={customerPrograms.programs} key={view} programId={view} onBack={goHome} onConsult={goToConsult} />}
 
-        <Hero onConsult={goToConsult} onBranch={() => openBranchDirectory()} onDetail={() => navigate('employment-support')} />
+        <Hero benefitGroups={customerPrograms.benefitGroups} programLabel={customerPrograms.programs.find(p => p.id === 'employment-support')!.label} onConsult={goToConsult} onBranch={() => openBranchDirectory()} onDetail={() => navigate('employment-support')} />
         {view === 'home' && <>
           <section className="mobile-home-summary">
             <h2>국민취업지원제도, 누가 받을 수 있나요?</h2>
@@ -180,7 +181,7 @@ export function HomePage({ branches, benefitYear }: {
       </aside>}
 
       <LegalModal content={legalModal ? LEGAL_CONTENT[legalModal] : null} onClose={() => setLegalModal(null)} />
-      <ProgramModal open={programModal.open} programId={programModal.programId} audience={programModal.audience}
+      <ProgramModal programs={customerPrograms.programs} open={programModal.open} programId={programModal.programId} audience={programModal.audience}
         onClose={closeProgramDetail} onOpenDetail={openProgramDetail} onConsult={goToConsult} />
       <ReviewModal open={reviewModal.open} review={reviewModal.index === null ? null : REVIEWS[reviewModal.index]}
         onClose={() => setReviewModal(m => ({ ...m, open: false }))} />

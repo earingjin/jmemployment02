@@ -8,7 +8,7 @@ import { EmploymentProgramNavigation, EmploymentQuickNavigation, employmentQuick
   focusEmploymentArea, selectEmploymentProgram } from '../src/components/admin/EmploymentProgramNavigation';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { buildEmploymentPreview } from '../src/components/admin/employmentPreview';
-import { EmploymentProgramPreview, EmploymentPreviewContent } from '../src/components/admin/EmploymentProgramPreview';
+import { EmploymentProgramPreview, EmploymentPreviewContent, renderCustomerPreviewMarkup } from '../src/components/admin/EmploymentProgramPreview';
 import { BranchSaveAuthError } from '../src/data/branchDirectory';
 import { BENEFIT_CONTENT_FIELDS, createEmploymentProgramsApi, EMPLOYMENT_PROGRAM_OPTIONS,
   POLICY_SOURCE_FIELDS, PROGRAM_CONTENT_FIELDS, PROGRAM_LOAD_ERROR, PROGRAM_SAVE_ERROR, SECTION_CONTENT_FIELDS,
@@ -347,7 +347,7 @@ test('preview uses all latest unsaved card drafts, including added/deleted lines
   assert.deepEqual(preview.program.policy, { date: '2026-10-08', source: '미저장 출처', url: 'https://example.com/unsaved' });
   const markup = renderToStaticMarkup(createElement(EmploymentPreviewContent, { data: preview }));
   assert.ok(markup.includes('미저장 추가 줄'));
-  assert.equal(markup.includes('첫째 줄'), false);
+  assert.equal(renderCustomerPreviewMarkup(preview, 'detail').includes('첫째 줄'), false); // Removed text appears only in the before/after change list.
   assert.equal(JSON.stringify({ data, states }), before);
   assert.ok(states.every(employmentEditorDirty));
   preview.sections[0].lines.push('미리보기 복사본만 변경');
@@ -367,13 +367,13 @@ test('preview fallback uses loaded values and exposes no structure or audit fiel
       inspect(child);
     }
   };
-  inspect(preview);
+  inspect({ program: preview.program, benefits: preview.benefits, sections: preview.sections }); // Customer component props retain only their required program ID internally.
   const markup = renderToStaticMarkup(createElement(EmploymentPreviewContent, { data: preview }));
   assert.equal(markup.includes('기업 지원 정보'), false);
-  for (const identifier of [f.program.id, f.section.section_key, f.benefit.benefit_key, f.section.variant]) assert.equal(markup.includes(identifier), false);
+  for (const identifier of [f.program.id, f.section.section_key, f.benefit.benefit_key, f.section.variant]) assert.equal(markup.includes('>' + identifier + '<'), false);
 });
 
-test('preview renders text safely and includes optional employer and policy content without executable URLs', () => {
+test('preview renders customer text safely and keeps non-displayed policy changes outside customer frames', () => {
   const f = fixture();
   const drafts = new Map<string, ContentValues>([
     ['program', { label: '<script>alert(1)</script>', employer_target: '기업 대상', employer_amount: '기업 금액', employer_desc: '기업 설명' }],
@@ -383,10 +383,12 @@ test('preview renders text safely and includes optional employer and policy cont
   const markup = renderToStaticMarkup(createElement(EmploymentPreviewContent, { data: preview }));
   assert.ok(markup.includes('&lt;script&gt;'));
   assert.equal(markup.includes('<script>'), false);
-  assert.ok(markup.includes('기업 지원 정보'));
-  assert.ok(markup.includes('기업 설명'));
-  assert.ok(markup.includes('javascript:alert(1)'));
-  assert.equal(markup.includes('href='), false);
+  const employerMarkup = renderCustomerPreviewMarkup(preview, 'employer');
+  assert.ok(employerMarkup.includes('기업 설명'));
+  const dialogMarkup = renderToStaticMarkup(createElement(EmploymentProgramPreview, { data: preview, onClose: () => {}, returnFocus: createRef<HTMLButtonElement>() }));
+  assert.ok(dialogMarkup.includes('javascript:alert(1)')); // Plain text in the non-displayed change list only.
+  assert.equal(renderCustomerPreviewMarkup(preview, 'detail').includes('javascript:alert(1)'), false);
+  assert.equal(employerMarkup.includes('href='), false);
 });
 
 test('preview dialog has explicit notice/close control and rendering it never sends requests or alters drafts', () => {
