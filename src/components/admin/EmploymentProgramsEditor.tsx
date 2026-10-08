@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type RefObject } from 'react';
-import { createPortal } from 'react-dom';
+import { createPortal, flushSync } from 'react-dom';
 import { BENEFIT_CONTENT_FIELDS, loadEmploymentProgram,
   POLICY_SOURCE_FIELDS, PROGRAM_CONTENT_FIELDS, PROGRAM_LOAD_ERROR, SECTION_CONTENT_FIELDS,
   type ContentField, type ContentValues, type EmploymentContentRow, type EmploymentPatchRequest, type EmploymentProgramData,
@@ -13,7 +13,8 @@ import { buildEmploymentPreview, type EmploymentPreviewData } from './employment
 import { DEFAULT_BENEFIT_YEAR } from '../../data/content';
 import { customerFieldScreens, customerFieldNotice, CUSTOMER_PREVIEW_SCREENS, type CustomerEditArea } from './employmentCustomerImpact';
 import { EmploymentProgramPreview } from './EmploymentProgramPreview';
-import { EmploymentProgramNavigation, EmploymentQuickNavigation, selectEmploymentProgram } from './EmploymentProgramNavigation';
+import { EmploymentProgramNavigation, buildEmploymentNavigationContent, focusEmploymentArea, selectEmploymentProgram,
+  type EmploymentNavigationContent, type EmploymentNavigationGroup } from './EmploymentProgramNavigation';
 
 export type SaveEmploymentContent = (request: EmploymentPatchRequest) => Promise<EmploymentContentRow>;
 
@@ -21,6 +22,14 @@ export function EmploymentProgramsEditor({ onSave, leaveGuard, navigationTarget,
   benefitYear?: string; onSave: SaveEmploymentContent; leaveGuard: RefObject<() => boolean>; navigationTarget: HTMLElement | null;
 }) {
   const [selected, setSelected] = useState<EmploymentProgramId>('employment-support');
+  const [navigationContent, setNavigationContent] = useState<EmploymentNavigationContent | null>(null);
+  const [activeArea, setActiveArea] = useState('employment-area-program');
+  const [mobileMenuExpanded, setMobileMenuExpanded] = useState(false);
+  // Selection and sidebar disclosure are independent: the selected business can still be collapsed by the user.
+  const [programExpanded, setProgramExpanded] = useState(true);
+  // At most one of the two sub-groups (benefits/sections) is open at a time.
+  const [openGroup, setOpenGroup] = useState<EmploymentNavigationGroup | null>(null);
+  const reportNavigation = useCallback((content: EmploymentNavigationContent) => setNavigationContent(content), []);
   const statuses = useRef(new Map<string, EmploymentEditStatus>());
   const [summary, setSummary] = useState({ dirty: false, saving: false });
   const reportStatus = useCallback((key: string, status?: EmploymentEditStatus) => {
@@ -44,24 +53,48 @@ export function EmploymentProgramsEditor({ onSave, leaveGuard, navigationTarget,
     window.addEventListener('beforeunload', beforeUnload);
     return () => { leaveGuard.current = () => true; window.removeEventListener('beforeunload', beforeUnload); };
   }, [canLeave, leaveGuard]);
-  const select = (id: EmploymentProgramId): boolean => selectEmploymentProgram(selected, id, canLeave, setSelected);
+  const select = (id: EmploymentProgramId): boolean => selectEmploymentProgram(selected, id, canLeave, next => {
+    setSelected(next);
+    setActiveArea('employment-area-program');
+    // A freshly selected business starts fully disclosed, same as before this panel was collapsible.
+    setProgramExpanded(true);
+    setOpenGroup(null);
+  });
+  const navigate = (id: string, document: Pick<Document, 'getElementById'>): boolean => {
+    if ([...statuses.current.values()].some(status => status.saving)) return false;
+    const target = document.getElementById(id);
+    if (!target) return false;
+    // Commit menu wrapping/selection before measuring the target, especially in the mobile layout.
+    flushSync(() => setActiveArea(id));
+    focusEmploymentArea(target);
+    return true;
+  };
   return (
     <section className="employment-cms" aria-labelledby="employment-cms-title">
       <h2 id="employment-cms-title" className="admin-card-title">고용지원사업 관리</h2>
       <p className="employment-cms-note">저장한 내용은 고객 웹사이트에 즉시 반영됩니다. 이미 열린 고객 화면에서는 새로고침 후 확인해 주세요. 공개 데이터 조회에 실패하면 기존 안내가 표시됩니다.</p>
-      {navigationTarget && createPortal(<EmploymentProgramNavigation selected={selected} onSelect={select} />, navigationTarget)}
+      {navigationTarget && createPortal(<EmploymentProgramNavigation selected={selected} onSelect={select} content={navigationContent} activeArea={activeArea}
+        onNavigate={navigate} saving={summary.saving}
+        expanded={programExpanded} onToggleExpand={() => setProgramExpanded(value => !value)}
+        openGroup={openGroup} onToggleGroup={group => setOpenGroup(current => current === group ? null : group)}
+        mobileExpanded={mobileMenuExpanded} onToggleMobile={() => setMobileMenuExpanded(value => !value)} />, navigationTarget)}
       {summary.saving ? <p className="employment-cms-note" role="status">저장 중에는 다른 사업이나 관리 탭으로 이동할 수 없습니다.</p>
         : summary.dirty && <p className="employment-cms-note" role="status">저장하지 않은 변경사항이 있습니다.</p>}
-      <div id="employment-program-panel" role="region" aria-labelledby={`employment-tab-${selected}`}>
-        <EmploymentProgramWorkspace key={selected} id={selected} benefitYear={benefitYear} onSave={onSave} reportStatus={reportStatus} />
+      <div id="employment-program-panel" role="region" aria-labelledby={`employment-tab-${selected}`}
+        onFocusCapture={event => {
+          const area = (event.target as HTMLElement).closest<HTMLElement>('.employment-navigation-target');
+          if (area?.id && event.currentTarget.contains(area)) setActiveArea(area.id);
+        }}>
+        <EmploymentProgramWorkspace key={selected} id={selected} benefitYear={benefitYear} onSave={onSave} reportStatus={reportStatus} reportNavigation={reportNavigation} />
       </div>
     </section>
   );
 }
 
-function EmploymentProgramWorkspace({ id, onSave, reportStatus, benefitYear }: {
+function EmploymentProgramWorkspace({ id, onSave, reportStatus, benefitYear, reportNavigation }: {
   id: EmploymentProgramId; benefitYear: string; onSave: SaveEmploymentContent;
   reportStatus: (key: string, status?: EmploymentEditStatus) => void;
+  reportNavigation: (content: EmploymentNavigationContent) => void;
 }) {
   const [data, setData] = useState<EmploymentProgramData | null>(null);
   const [error, setError] = useState('');
@@ -69,7 +102,17 @@ function EmploymentProgramWorkspace({ id, onSave, reportStatus, benefitYear }: {
   const drafts = useRef(new Map<string, ContentValues>());
   const previewButton = useRef<HTMLButtonElement>(null);
   const [preview, setPreview] = useState<EmploymentPreviewData | null>(null);
-  const reportDraft = useCallback((areaId: string, draft: ContentValues) => { drafts.current.set(areaId, draft); }, []);
+  const publishNavigation = useCallback((current: EmploymentProgramData | null) => {
+    reportNavigation(buildEmploymentNavigationContent(id, current, drafts.current, !!error));
+  }, [id, error, reportNavigation]);
+  const reportDraft = useCallback((areaId: string, draft: ContentValues) => {
+    const previous = drafts.current.get(areaId);
+    drafts.current.set(areaId, draft);
+    const labelChanged = areaId.startsWith('section-') ? previous?.title !== draft.title
+      : areaId.startsWith('benefit-') && (previous?.type_label !== draft.type_label || JSON.stringify(previous?.item_names) !== JSON.stringify(draft.item_names));
+    if (labelChanged && data) publishNavigation(data);
+  }, [data, publishNavigation]);
+  useEffect(() => { publishNavigation(error ? null : data); }, [data, error, publishNavigation]);
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
@@ -97,7 +140,6 @@ function EmploymentProgramWorkspace({ id, onSave, reportStatus, benefitYear }: {
         <button ref={previewButton} type="button" className="employment-cms-line-button"
           onClick={() => setPreview(buildEmploymentPreview(data, drafts.current, benefitYear))}>고객 화면 미리보기</button>
       </div>
-      <EmploymentQuickNavigation sections={data.sections} />
       <EmploymentRowEditor program={data.program} row={data.program} fields={PROGRAM_CONTENT_FIELDS} selector={{ target: 'program', program_id: id }}
         title="기본 정보" saveLabel="기본 정보 저장" areaId="program" onSave={onSave} onSaved={saved} reportStatus={reportStatus} reportDraft={reportDraft} />
       <h3 className="admin-card-title employment-navigation-target" id="employment-group-benefits" tabIndex={-1}>지원금 안내</h3>

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { DEFAULT_MAP_EMBED_URL, PUBLIC_BRANCH, branchSuffix, mapEmbedUrl, naverMapSearchUrl, type BranchMap } from '../data/branches';
-import { PRESS_NEWS, REVIEWS } from '../data/content';
+import { PRESS_NEWS, REVIEWS, SMART_SOLUTIONS, type SmartSolution } from '../data/content';
 import type { CustomerProgramData } from '../data/customerProgramAdapter';
 import { ConsultationSection } from '../components/home/ConsultationSection';
 import { openConsultationForm } from '../data/consultation';
@@ -33,10 +33,12 @@ const currentView = () => viewFromPath(window.location.pathname);
 const pushPath = (path: string) => { if (window.location.pathname !== path) window.history.pushState({}, '', path); };
 
 // 공개 사이트 전체 (원본 #publicPage)
-export function HomePage({ branches, benefitYear, customerPrograms }: {
+export function HomePage({ branches, benefitYear, customerPrograms, smartCareSolutions = SMART_SOLUTIONS }: {
   branches: BranchMap;
   benefitYear: string;
   customerPrograms: CustomerProgramData;
+  // App passes its single loaded snapshot; the static definition is only the safe default.
+  smartCareSolutions?: readonly SmartSolution[];
 }) {
   const [view, setView] = useState<View>(currentView);
   const publicRef = useRef<HTMLDivElement>(null);
@@ -141,7 +143,7 @@ export function HomePage({ branches, benefitYear, customerPrograms }: {
       <div className={'page' + (view !== 'home' ? ' sub-mode' : ' mobile-home')}>
         <EmployerView programs={customerPrograms.programs} active={view === 'employer'} benefitYear={benefitYear} onDetail={id => openProgramDetail(id, 'employer')} onConsult={goToConsult} />
         <BranchDirectoryView active={view === 'branch'} branches={branches} region={bdRegion} onRegion={setBdRegion} onOpenMap={openBranchMap} />
-        {view === 'smartcare' && <SmartCarePage onBack={goHome} onConsult={goToConsult} />}
+        {view === 'smartcare' && <SmartCarePage solutions={smartCareSolutions} onBack={goHome} onConsult={goToConsult} />}
         {isProgramView(view) && <ProgramDetailPage programs={customerPrograms.programs} key={view} programId={view} onBack={goHome} onConsult={goToConsult} />}
 
         <Hero benefitGroups={customerPrograms.benefitGroups} programLabel={customerPrograms.programs.find(p => p.id === 'employment-support')!.label} onConsult={goToConsult} onBranch={() => openBranchDirectory()} onDetail={() => navigate('employment-support')} />
@@ -160,7 +162,7 @@ export function HomePage({ branches, benefitYear, customerPrograms }: {
           <p>진단부터 서류 준비, 면접까지 취업 준비 과정을 지원합니다.</p>
           <button type="button" onClick={() => navigate('smartcare')}>SmartCare 자세히 보기 →</button>
         </section>}
-        <SmartCareSection onDetail={() => navigate('smartcare')} />
+        <SmartCareSection solutions={smartCareSolutions} onDetail={() => navigate('smartcare')} />
         <ReviewsSection onOpenReview={index => setReviewModal({ open: true, index })} />
         <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={() => navigate('employer')} />
         <NewsSection onOpenPress={index => setPressModal({ open: true, index })} />

@@ -8,6 +8,7 @@ import {
 import { DEFAULT_BENEFIT_YEAR } from './data/content';
 import { HomePage } from './pages/HomePage';
 import { getCustomerProgramFallback, loadCustomerProgramsWithFallback } from './data/customerProgramFallback';
+import { getSmartCareFallback, loadSmartCareWithFallback } from './data/smartCare';
 
 const AdminRoute = lazy(() =>
   import('./components/admin/AdminRoute').then(module => ({ default: module.AdminRoute }))
@@ -76,6 +77,8 @@ function mergeRows(
 export default function App() {
   const [branches, setBranches] = useState(loadBranches);
   const [customerPrograms, setCustomerPrograms] = useState(getCustomerProgramFallback);
+  // One SmartCare snapshot shared by the home section, detail page and guide modal.
+  const [smartCareSolutions, setSmartCareSolutions] = useState(getSmartCareFallback);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -83,8 +86,13 @@ export default function App() {
     void Promise.resolve().then(async () => {
       if (controller.signal.aborted) return;
       try {
-        const data = await loadCustomerProgramsWithFallback(undefined, controller.signal);
-        if (!controller.signal.aborted) setCustomerPrograms(data);
+        // Independent loads: a slow or failed SmartCare GET never delays employment content (and vice versa).
+        await Promise.all([
+          loadCustomerProgramsWithFallback(undefined, controller.signal)
+            .then(data => { if (!controller.signal.aborted) setCustomerPrograms(data); }),
+          loadSmartCareWithFallback(undefined, controller.signal)
+            .then(data => { if (!controller.signal.aborted) setSmartCareSolutions(data.solutions); }),
+        ]);
       } catch {
         // Cancellation keeps the initial static snapshot and never updates an unmounted App.
       }
@@ -182,5 +190,5 @@ export default function App() {
     );
   }
 
-  return <HomePage branches={branches} benefitYear={benefitYear} customerPrograms={customerPrograms} />;
+  return <HomePage branches={branches} benefitYear={benefitYear} customerPrograms={customerPrograms} smartCareSolutions={smartCareSolutions} />;
 }

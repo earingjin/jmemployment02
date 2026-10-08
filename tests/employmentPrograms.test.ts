@@ -442,7 +442,7 @@ test('sidebar offers exactly four business choices and uses the existing dirty/s
   const guard = () => canLeaveEmploymentEditor([{ dirty: true, saving }], () => { confirmations++; return accepted; });
   const onSelect = (id: EmploymentProgramId) => selectEmploymentProgram(selected, id, guard, id => { selected = id; });
   const tree = EmploymentProgramNavigation({ selected, onSelect });
-  const buttons = elementsOfType(tree, 'button');
+  const buttons = elementsOfType(tree, 'button').filter(button => button.props.id?.startsWith('employment-tab-'));
   assert.equal(buttons.length, 4);
   assert.deepEqual(buttons.map(button => button.props.children), EMPLOYMENT_PROGRAM_OPTIONS.map(option => option.label));
   assert.equal(buttons[0].props['aria-pressed'], true);
@@ -520,7 +520,7 @@ test('administrator entry retains the branch default and search/editor while sho
   const html = renderToStaticMarkup(createElement(AdminPage, { visible: true, openSeq: 0, branches, benefitYear: '2026',
     onSaveBranch: async () => {}, onSaveBenefitYear: () => {}, onBack: () => {},
     onUploadImage: async () => {}, onDeleteImage: async () => {}, onSaveImageSettings: async () => {},
-    onSaveProgramContent: async () => fixture().program }));
+    onSaveProgramContent: async () => fixture().program, onSaveSmartCareContent: async () => { throw new Error('unused'); } }));
   for (const label of ['지사 관리', '고용지원사업 관리', '사이트 공통 설정', '계정 관리']) assert.ok(html.includes(label));
   assert.ok(html.indexOf('admin-navigation-header') < html.indexOf('admin-sidebar'));
   assert.ok(html.includes('id="branchSearch"'));

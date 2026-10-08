@@ -19,12 +19,12 @@ export function SmartSolutionModal({ open, solution, onClose, onConsult }: {
 }) {
   return (
     <ModalOverlay id="aiFeatureModalOverlay" className="map-modal-overlay" open={open} onClose={onClose}>
-      <div className="ai-modal">
+      <div className="ai-modal" data-smartcare-id={solution?.key}>
         <ModalCloseButton onClick={onClose} />
         <div className="ai-modal-icon" id="aiModalIcon">{solution && MODAL_ICONS[solution.key]}</div>
-        <h3 id="aiModalTitle" style={{ fontSize: '22px', fontWeight: 800, marginBottom: '8px' }}>{solution?.title}</h3>
-        <p id="aiModalDesc" style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{solution?.modal.desc}</p>
-        <ul id="aiModalList">{solution?.modal.list.map(li => <li key={li}>{li}</li>)}</ul>
+        <h3 id="aiModalTitle" data-smartcare-field="title" style={{ fontSize: '22px', fontWeight: 800, marginBottom: '8px' }}>{solution?.title}</h3>
+        <p id="aiModalDesc" data-smartcare-field="description" style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{solution?.modal.desc}</p>
+        <ul id="aiModalList">{solution?.modal.list.map((li, index) => <li key={li} data-smartcare-field="details" data-smartcare-index={index}>{li}</li>)}</ul>
         <button className="ai-modal-cta" onClick={onConsult}>상담 신청하기</button>
       </div>
     </ModalOverlay>

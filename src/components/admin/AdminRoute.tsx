@@ -7,12 +7,13 @@ import { SESSION_RENEWAL_WINDOW_SECONDS } from './adminSessionRenewal';
 import { AdminPasswordChange } from './AdminPasswordChange';
 import './AdminLogin.css';
 import { saveEmploymentContent, type EmploymentPatchRequest } from '../../data/employmentPrograms';
+import { saveSmartCareContent as saveSmartCareRequest, type SmartCarePatchRequest } from '../../data/smartCare';
 
 const AdminPage = lazy(() => import('./AdminPage').then(module => ({ default: module.AdminPage })));
 const LOGIN_ERROR = '아이디 또는 비밀번호를 확인해주세요.';
 const SERVICE_ERROR = '로그인 서비스를 사용할 수 없습니다. 관리자에게 문의해주세요.';
 
-export function AdminRoute(props: Omit<ComponentProps<typeof AdminPageComponent>, 'sessionActions' | 'accountActions' | 'onSaveBranch' | 'onUploadImage' | 'onDeleteImage' | 'onSaveImageSettings' | 'onSaveProgramContent'> & {
+export function AdminRoute(props: Omit<ComponentProps<typeof AdminPageComponent>, 'sessionActions' | 'accountActions' | 'onSaveBranch' | 'onUploadImage' | 'onDeleteImage' | 'onSaveImageSettings' | 'onSaveProgramContent' | 'onSaveSmartCareContent'> & {
   onBranchSaved: (saved: BranchDirectoryRow) => void;
   onBranchImageSaved: (saved: BranchImageRow, slot: BranchImageSlot) => void;
 }) {
@@ -22,6 +23,14 @@ export function AdminRoute(props: Omit<ComponentProps<typeof AdminPageComponent>
   const saveProgramContent = async (request: EmploymentPatchRequest) => {
     try {
       return await withSaveAuthorization(authorization => saveEmploymentContent(request, authorization));
+    } catch (cause) {
+      if (cause instanceof BranchSaveAuthError) await logout(cause.message);
+      throw cause;
+    }
+  };
+  const saveSmartCareContent = async (request: SmartCarePatchRequest) => {
+    try {
+      return await withSaveAuthorization(authorization => saveSmartCareRequest(request, authorization));
     } catch (cause) {
       if (cause instanceof BranchSaveAuthError) await logout(cause.message);
       throw cause;
@@ -66,7 +75,7 @@ export function AdminRoute(props: Omit<ComponentProps<typeof AdminPageComponent>
 
   return (
     <Suspense fallback={<div className="admin-login-shell" role="status">관리자 화면을 불러오는 중...</div>}>
-      <AdminPage {...props} onSaveProgramContent={saveProgramContent} onSaveBranch={saveBranch} onUploadImage={(slug, slot, file) => changeImage(slug, slot, 'upload', file)} onDeleteImage={(slug, slot) => changeImage(slug, slot, 'delete')} onSaveImageSettings={(slug, slot, settings) => changeImage(slug, slot, 'settings', settings)} sessionActions={
+      <AdminPage {...props} onSaveProgramContent={saveProgramContent} onSaveSmartCareContent={saveSmartCareContent} onSaveBranch={saveBranch} onUploadImage={(slug, slot, file) => changeImage(slug, slot, 'upload', file)} onDeleteImage={(slug, slot) => changeImage(slug, slot, 'delete')} onSaveImageSettings={(slug, slot, settings) => changeImage(slug, slot, 'settings', settings)} sessionActions={
         <div className="admin-session-area">
           <div className="admin-session-toolbar">
             <span role="timer" aria-label="세션 남은 시간">세션 남은 시간 {time}</span>
