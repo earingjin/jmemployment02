@@ -282,7 +282,7 @@ test('leave decision blocks while saving, confirms unsaved drafts and allows cle
   assert.equal(asked, 2);
 });
 
-test('real SmartCare editor: sidebar follows drafts, guards service/tab/site leave, previews and serializes saves', async () => {
+test('real SmartCare editor: flat sidebar follows drafts, guards service/tab/site leave, previews and serializes saves', async () => {
   const g = globals(); const data = rows(); let loads = 0; let saves = 0; let release!: () => void;
   const pending = new Promise<void>(resolve => { release = resolve; }); let sent!: SmartCarePatchRequest;
   const onSave: SaveSmartCareContent = async request => { saves++; sent = request; await pending; return { ...data[0], ...request.patch, updated_at: '2026-10-08T01:00:00Z' } as SmartCareRow; };
@@ -295,38 +295,31 @@ test('real SmartCare editor: sidebar follows drafts, guards service/tab/site lea
     assert.equal(loads, 1); assert.ok(g.hasUnload());
     let nav = component(root, SmartCareNavigation);
     assert.deepEqual(nav.props.items.map((item: any) => item.id), [...SMARTCARE_IDS]);
+    // No accordion props remain: selecting a service is the only action the sidebar exposes.
+    assert.deepEqual(Object.keys(nav.props).sort(), ['items', 'loading', 'mobileExpanded', 'onSelect', 'onToggleMobile', 'saving', 'selected'].sort());
     const navMarkup = renderToStaticMarkup(React.createElement(SmartCareNavigation, nav.props));
-    assert.match(navMarkup, /STEP 1/); assert.match(navMarkup, /smartcare-area-detail-3/);
-    // Default: the selected service's panel and its single "상세 안내" group both start expanded (pre-existing behavior).
-    assert.equal(nav.props.expanded, true); assert.equal(nav.props.detailsOpen, true);
-    assert.equal((navMarkup.match(/aria-expanded="true"/g) || []).length, 2);
+    assert.match(navMarkup, /STEP 1/);
+    // The four fixed categories only; no per-field sub-items and no +/- disclosure markers.
+    assert.equal((navMarkup.match(/admin-branch-item/g) || []).length, SMARTCARE_IDS.length);
+    assert.doesNotMatch(navMarkup, /aria-expanded="true"/);
     const formElement = elements(root, e => typeof e.props.reportDraft === 'function')[0]; assert.ok(formElement);
     form = harness(() => (formElement.type as (props: any) => React.ReactElement)(formElement.props));
     let formRoot = form.render();
+    // Clicking the selected service's own button is a no-op (no collapse concept left) and leaves the draft untouched.
+    assert.equal(nav.props.onSelect('burkman'), true);
     assert.equal(leaveGuard.current(), true); assert.equal(g.unload(), false);
     elements(formRoot, e => e.props.id === 'smartcare-field-title')[0].props.onChange({ target: { value: '미저장 버크만' } });
     formRoot = form.render(); root = parent.render(); nav = component(root, SmartCareNavigation);
     assert.equal(nav.props.items[0].title, '미저장 버크만');
     assert.equal(g.unload(), true);
-    // Collapsing the group, then the whole selected-service panel, never discards the unsaved draft or selection.
-    nav.props.onToggleDetails(); root = parent.render(); nav = component(root, SmartCareNavigation);
-    assert.equal(nav.props.detailsOpen, false);
-    nav.props.onToggleExpand(); root = parent.render(); nav = component(root, SmartCareNavigation);
-    assert.equal(nav.props.expanded, false); assert.equal(nav.props.selected, 'burkman');
-    assert.equal(elements(form.render(), e => e.props.id === 'smartcare-field-title')[0].props.value, '미저장 버크만');
-    nav.props.onToggleExpand(); nav.props.onToggleDetails();
-    root = parent.render(); nav = component(root, SmartCareNavigation);
-    assert.equal(nav.props.expanded, true); assert.equal(nav.props.detailsOpen, true);
-    // Service switch and admin tab/site leave share one guard; rejecting keeps the draft.
+    // All of the selected service's editable fields render together on the right; nothing is hidden behind a sub-menu.
+    for (const id of ['smartcare-field-stage', 'smartcare-field-title', 'smartcare-field-description', 'smartcare-field-details-0'])
+      assert.ok(elements(formRoot, e => e.props.id === id)[0], id);
+    // Service switch and admin tab/site leave share one guard; rejecting keeps the draft and selection.
     assert.equal(nav.props.onSelect('coverletter'), false); assert.equal(g.confirmations, 1);
     assert.equal(leaveGuard.current(), false); assert.equal(g.confirmations, 2);
     assert.equal(component(parent.render(), SmartCareNavigation).props.selected, 'burkman');
     assert.equal(elements(form.render(), e => e.props.id === 'smartcare-field-title')[0].props.value, '미저장 버크만');
-    const calls: string[] = [];
-    const document = { getElementById(id: string) { return { focus() { calls.push('focus:' + id); }, scrollIntoView() { calls.push('scroll:' + id); } } as unknown as HTMLElement; } };
-    assert.equal(nav.props.onNavigate('smartcare-area-detail-2', document), true);
-    assert.equal(component(parent.render(), SmartCareNavigation).props.activeArea, 'smartcare-area-detail-2');
-    assert.deepEqual(calls, ['focus:smartcare-area-detail-2', 'scroll:smartcare-area-detail-2']);
     elements(form.render(), e => e.type === 'button' && e.props.children === '고객 화면 미리보기')[0].props.onClick();
     const preview = component(form.render(), SmartCarePreview);
     assert.equal(preview.props.data.solutions[0].title, '미저장 버크만');
@@ -337,8 +330,11 @@ test('real SmartCare editor: sidebar follows drafts, guards service/tab/site lea
     root = parent.render(); nav = component(root, SmartCareNavigation);
     assert.equal(saves, 1); assert.deepEqual(sent, { solution_id: 'burkman', patch: { title: '미저장 버크만' } });
     assert.equal(nav.props.saving, true);
-    assert.equal(nav.props.onNavigate('smartcare-area-basic', document), false);
-    assert.equal(leaveGuard.current(), false); assert.equal(nav.props.onSelect('aptitude'), false); assert.equal(g.confirmations, 2);
+    // Selection is also blocked while saving: the active service's own button stays enabled, others are disabled.
+    const savingButtons = elements(SmartCareNavigation(nav.props), e => e.type === 'button' && e.props.id?.startsWith('smartcare-tab-'));
+    assert.deepEqual(savingButtons.map(b => b.props.disabled), [false, true, true, true]);
+    assert.equal(nav.props.onSelect('aptitude'), false);
+    assert.equal(leaveGuard.current(), false); assert.equal(g.confirmations, 2);
     assert.equal(g.unload(), true);
     (form.render() as React.ReactElement<any>).props.onSubmit({ preventDefault() {} }); assert.equal(saves, 1);
     release(); await form.settle(); root = parent.render();

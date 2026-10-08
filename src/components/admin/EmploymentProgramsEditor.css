@@ -5,6 +5,8 @@
 .employment-program-choice h3 { margin: 0; font-size: inherit; }
 .employment-program-navigation .admin-branch-item::after { content: '+'; flex-shrink: 0; margin-left: 8px; }
 .employment-program-navigation .admin-branch-item[aria-expanded="true"]::after { content: '−'; }
+/* SmartCare's sidebar is a flat selection list (no sub-menus), so it has no +/- disclosure indicator. */
+.smartcare-program-navigation .admin-branch-item::after { content: none; }
 .employment-program-navigation button:disabled { opacity: .5; cursor: default; }
 .employment-program-mobile-toggle { display: none; }
 .employment-edit-navigation { margin: 0 0 16px 8px; padding-left: 10px; border-left: 1px solid #475569; }

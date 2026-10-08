@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
-import { createPortal, flushSync } from 'react-dom';
+import { createPortal } from 'react-dom';
 import { loadSmartCareRows, SMARTCARE_FIELDS, SMARTCARE_IDS, SMARTCARE_LOAD_ERROR, SMARTCARE_MAX_DETAILS, SMARTCARE_MIN_DETAILS,
   type SmartCareId, type SmartCarePatchRequest, type SmartCareRow } from '../../data/smartCare';
 import type { ContentValues } from '../../data/employmentPrograms';
 import { addSmartCareDetail, buildSmartCarePatch, createSmartCareEditorState, editSmartCareField, failedSmartCareEditorState,
   removeSmartCareDetail, savedSmartCareEditorState, smartCareEditorDirty, smartCareEditorErrors } from './smartCareEditorState';
 import { canLeaveEmploymentEditor, type EmploymentEditStatus } from './employmentEditorState';
-import { SMARTCARE_AREA, SmartCareNavigation, focusSmartCareArea, smartCareServiceLabel, type SmartCareNavigationItem } from './SmartCareNavigation';
+import { SMARTCARE_AREA, SmartCareNavigation, smartCareServiceLabel, type SmartCareNavigationItem } from './SmartCareNavigation';
 import { buildSmartCarePreview, smartCareFieldNotice, type SmartCarePreviewData } from './smartCarePreviewModel';
 import { SmartCarePreview } from './SmartCarePreview';
 import './EmploymentProgramsEditor.css';
@@ -28,11 +28,7 @@ export function SmartCareEditor({ onSave, leaveGuard, navigationTarget, load = l
   const [attempt, setAttempt] = useState(0);
   const [selected, setSelected] = useState<SmartCareId>(SMARTCARE_IDS[0]);
   const [draft, setDraft] = useState<ContentValues | null>(null);
-  const [activeArea, setActiveArea] = useState<string>(SMARTCARE_AREA.basic);
   const [mobileMenuExpanded, setMobileMenuExpanded] = useState(false);
-  // Selection and sidebar disclosure are independent: the selected service can still be collapsed by the user.
-  const [serviceExpanded, setServiceExpanded] = useState(true);
-  const [detailsOpen, setDetailsOpen] = useState(true);
   const status = useRef<EmploymentEditStatus>(CLEAN);
   const [summary, setSummary] = useState<EmploymentEditStatus>(CLEAN);
   const reportStatus = useCallback((next: EmploymentEditStatus) => { status.current = next; setSummary(next); }, []);
@@ -63,19 +59,6 @@ export function SmartCareEditor({ onSave, leaveGuard, navigationTarget, load = l
     if (!canLeave()) return false;
     setSelected(id);
     setDraft(null);
-    setActiveArea(SMARTCARE_AREA.basic);
-    // A freshly selected service starts fully disclosed, same as before this panel was collapsible.
-    setServiceExpanded(true);
-    setDetailsOpen(true);
-    return true;
-  };
-  const navigate = (id: string, document: Pick<Document, 'getElementById'>): boolean => {
-    if (status.current.saving) return false;
-    const target = document.getElementById(id);
-    if (!target) return false;
-    // Commit menu selection before measuring the target, especially in the mobile layout.
-    flushSync(() => setActiveArea(id));
-    focusSmartCareArea(target);
     return true;
   };
   const navigationItems: SmartCareNavigationItem[] | null = rows && rows.map(row => {
@@ -90,20 +73,14 @@ export function SmartCareEditor({ onSave, leaveGuard, navigationTarget, load = l
       <h2 id="smartcare-cms-title" className="admin-card-title">SmartCare 관리</h2>
       <p className="employment-cms-note">고정된 4개 서비스의 단계명·서비스명·설명·상세 안내만 수정합니다. 저장한 내용은 고객 웹사이트에 즉시 반영되며, 이미 열린 고객 화면에서는 새로고침 후 확인해 주세요. 공개 데이터 조회에 실패하면 기존 안내가 표시됩니다.</p>
       {navigationTarget && createPortal(<SmartCareNavigation items={navigationItems} selected={selected} onSelect={select}
-        activeArea={activeArea} onNavigate={navigate} saving={summary.saving} loading={!rows && !error}
-        expanded={serviceExpanded} onToggleExpand={() => setServiceExpanded(value => !value)}
-        detailsOpen={detailsOpen} onToggleDetails={() => setDetailsOpen(value => !value)}
+        saving={summary.saving} loading={!rows && !error}
         mobileExpanded={mobileMenuExpanded} onToggleMobile={() => setMobileMenuExpanded(value => !value)} />, navigationTarget)}
       {summary.saving ? <p className="employment-cms-note" role="status">저장 중에는 다른 서비스나 관리 탭으로 이동할 수 없습니다.</p>
         : summary.dirty && <p className="employment-cms-note" role="status">저장하지 않은 변경사항이 있습니다.</p>}
       {error ? <div className="admin-card"><p className="employment-cms-error" role="alert">{error}</p>
         <button type="button" className="admin-save-btn" onClick={() => setAttempt(value => value + 1)}>다시 불러오기</button></div>
         : !rows || !row ? <p className="employment-cms-note" role="status">SmartCare 내용을 불러오는 중...</p>
-        : <div id="smartcare-service-panel" role="region" aria-labelledby={'smartcare-tab-' + selected}
-          onFocusCapture={event => {
-            const area = (event.target as HTMLElement).closest<HTMLElement>('.employment-navigation-target');
-            if (area?.id && event.currentTarget.contains(area)) setActiveArea(area.id);
-          }}>
+        : <div id="smartcare-service-panel" role="region" aria-labelledby={'smartcare-tab-' + selected}>
           <SmartCareServiceForm key={selected} row={row} rows={rows} onSave={onSave} reportStatus={reportStatus} reportDraft={setDraft}
             onSaved={saved => setRows(current => current && current.map(item => item.id === saved.id ? saved : item))} />
         </div>}
