@@ -1,12 +1,14 @@
 
 import { lazy, Suspense, useEffect, useState } from 'react';
-import type { BranchDirectoryRow as BranchRow } from './data/branchDirectory';
+import type { BranchDirectoryRow as BranchRow, BranchImageRow, BranchImageSlot } from './data/branchDirectory';
 import {
   createInitialBranches,
   type BranchMap,
 } from './data/branches';
 import { DEFAULT_BENEFIT_YEAR } from './data/content';
 import { HomePage } from './pages/HomePage';
+import { getCustomerProgramFallback, loadCustomerProgramsWithFallback } from './data/customerProgramFallback';
+import { getSmartCareFallback, loadSmartCareWithFallback } from './data/smartCare';
 
 const AdminRoute = lazy(() =>
   import('./components/admin/AdminRoute').then(module => ({ default: module.AdminRoute }))
@@ -54,6 +56,14 @@ function mergeRows(
       phone: row.phone,
       address: row.address,
       mapUrl: row.map_url,
+      imagePath: row.image_path,
+      imagePath2: row.image_path_2,
+      imageZoom: row.image_zoom,
+      imagePositionX: row.image_position_x,
+      imagePositionY: row.image_position_y,
+      image2Zoom: row.image_2_zoom,
+      image2PositionX: row.image_2_position_x,
+      image2PositionY: row.image_2_position_y,
       region: row.region,
       hours: row.hours,
       published: row.published,
@@ -66,6 +76,29 @@ function mergeRows(
 
 export default function App() {
   const [branches, setBranches] = useState(loadBranches);
+  const [customerPrograms, setCustomerPrograms] = useState(getCustomerProgramFallback);
+  // One SmartCare snapshot shared by the home section, detail page and guide modal.
+  const [smartCareSolutions, setSmartCareSolutions] = useState(getSmartCareFallback);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    // Defer one microtask so StrictMode's discarded effect never starts a second GET.
+    void Promise.resolve().then(async () => {
+      if (controller.signal.aborted) return;
+      try {
+        // Independent loads: a slow or failed SmartCare GET never delays employment content (and vice versa).
+        await Promise.all([
+          loadCustomerProgramsWithFallback(undefined, controller.signal)
+            .then(data => { if (!controller.signal.aborted) setCustomerPrograms(data); }),
+          loadSmartCareWithFallback(undefined, controller.signal)
+            .then(data => { if (!controller.signal.aborted) setSmartCareSolutions(data.solutions); }),
+        ]);
+      } catch {
+        // Cancellation keeps the initial static snapshot and never updates an unmounted App.
+      }
+    });
+    return () => controller.abort();
+  }, []);
   const [benefitYear, setBenefitYear] =
     useState(DEFAULT_BENEFIT_YEAR);
 
@@ -117,14 +150,23 @@ export default function App() {
   }, []);
 
   const applySavedBranch = (saved: BranchRow): void => {
-    const updated = mergeRows(branches, [saved]);
+    setBranches(current => {
+      const updated = mergeRows(current, [saved]);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  };
 
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(updated)
-    );
-
-    setBranches(updated);
+  const applySavedBranchImage = (saved: BranchImageRow, slot: BranchImageSlot): void => {
+    setBranches(current => {
+      if (!current[saved.slug]) return current;
+      const image = slot === 1
+        ? { imagePath: saved.image_path, imageZoom: saved.image_zoom, imagePositionX: saved.image_position_x, imagePositionY: saved.image_position_y }
+        : { imagePath2: saved.image_path_2, image2Zoom: saved.image_2_zoom, image2PositionX: saved.image_2_position_x, image2PositionY: saved.image_2_position_y };
+      const updated = { ...current, [saved.slug]: { ...current[saved.slug], ...image } };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
   if (pathname === '/admin') {
@@ -136,6 +178,7 @@ export default function App() {
           branches={branches}
           benefitYear={benefitYear}
           onBranchSaved={applySavedBranch}
+          onBranchImageSaved={applySavedBranchImage}
           onSaveBenefitYear={setBenefitYear}
           onBack={() => {
             window.history.pushState({}, '', '/');
@@ -147,5 +190,5 @@ export default function App() {
     );
   }
 
-  return <HomePage branches={branches} benefitYear={benefitYear} />;
+  return <HomePage branches={branches} benefitYear={benefitYear} customerPrograms={customerPrograms} smartCareSolutions={smartCareSolutions} />;
 }

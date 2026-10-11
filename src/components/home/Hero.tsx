@@ -2,6 +2,7 @@ import heroConsulting from '../../assets/hero-consulting.png';
 import benefitVideo from '../../assets/국취신청.mp4';
 import { AutoplayVideo } from '../common/AutoplayVideo';
 import { BENEFIT_GROUPS } from '../../data/programs';
+import type { CustomerBenefitGroup } from '../../data/customerProgramAdapter';
 
 const renderBenefitHeadline = (headline: string) => {
   const match = headline.match(/^(최대 )([\d,]+)(만원)$/);
@@ -11,10 +12,12 @@ const renderBenefitHeadline = (headline: string) => {
 
 // Hero: 배경 이미지 + 좌측 문구/CTA
 // 국민취업지원제도 수당(Ⅰ유형/Ⅱ유형/취업성공수당)을 최우선으로 노출한다. 데이터는 BenefitSection·상세 페이지와 동일한
-// BENEFIT_GROUPS(src/data/programs.ts)를 그대로 재사용하며, 여기서 새로 금액을 만들거나 합산하지 않는다.
+// App의 고객 데이터 snapshot을 재사용하며, 여기서 새로 금액을 만들거나 합산하지 않는다.
 // Hero 카드는 요약(유형/수당명/핵심 금액)만 보여주고, 세부 지급조건은 "자세히 보기" → 상세 페이지(EmploymentSupportPage)에서 확인한다.
 // .hero-right(영상·요약 카드 등 원본 DOM)는 CSS로 계속 숨겨진 상태이며 이번 개편에서 건드리지 않는다.
-export function Hero({ onConsult, onBranch, onDetail }: {
+export function Hero({ onConsult, onBranch, onDetail, benefitGroups = BENEFIT_GROUPS, programLabel = '국민취업지원제도' }: {
+  benefitGroups?: CustomerBenefitGroup[];
+  programLabel?: string;
   onConsult: () => void;
   onBranch: () => void;
   onDetail: () => void;
@@ -25,15 +28,15 @@ export function Hero({ onConsult, onBranch, onDetail }: {
         <div className="hero-left">
           <h1 className="hero-title" id="pv-hero-headline">
             취업이 막막할 때<br />
-            <span className="highlight">국민취업지원제도 상담부터</span>
+            <span className="highlight">{programLabel} 상담부터</span>
           </h1>
           <p className="hero-desc">
-            구직촉진수당 최대 360만 원, 취업성공수당 최대 150만 원<br />
+            {benefitGroups.filter(group => group.headline).map(group => group.items.join(' · ') + ' ' + group.headline!.replace(/만원/g, '만 원')).join(', ')}<br />
             내가 받을 수 있는 지원금, 상담을 통해 확인해 보세요.
           </p>
 
           <div className="hero-benefit-grid">
-            {BENEFIT_GROUPS.map(group => (
+            {benefitGroups.map(group => (
               <div className={'hero-benefit-card' + (group.type === 'Ⅰ유형' ? ' primary' : '')} key={group.type}>
                 <div className="hero-benefit-top">
                   <strong className="hero-benefit-name">{group.items.join(' · ')}</strong>
@@ -58,7 +61,7 @@ export function Hero({ onConsult, onBranch, onDetail }: {
               상담 신청하기 ↗
             </button>
             <button className="btn-pill-outline hero-detail-cta" onClick={onDetail}>
-              국민취업지원제도 자세히 보기 →
+              {programLabel} 자세히 보기 →
             </button>
           </div>
 
@@ -69,7 +72,7 @@ export function Hero({ onConsult, onBranch, onDetail }: {
           <div className="hero-benefit-video">
             <div className="hero-video-badge">▶ 구직촉진수당 신청 영상</div>
             <AutoplayVideo src={benefitVideo} label="구직촉진수당 신청 안내 영상" />
-            <div className="hero-video-caption">구직촉진수당, 이렇게 신청해요 <span>국민취업지원제도 안내</span></div>
+            <div className="hero-video-caption">구직촉진수당, 이렇게 신청해요 <span>{programLabel} 안내</span></div>
           </div>
           <div className="hero-visual-card consulting-card">
             <img className="hero-consulting-image" src={heroConsulting} alt="상담사와 청년 구직자가 취업 계획을 함께 살펴보는 모습" />
@@ -79,7 +82,7 @@ export function Hero({ onConsult, onBranch, onDetail }: {
               <span className="hvc-year">국비 100% 무료</span>
             </div>
             <div className="hvc-main-benefit">
-              <div className="tag">국민취업지원제도</div>
+              <div className="tag">{programLabel}</div>
               <div className="amount">수당 안내</div>
               <div className="sub">참여 유형별 수당을 확인하세요</div>
             </div>

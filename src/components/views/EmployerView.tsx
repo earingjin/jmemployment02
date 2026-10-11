@@ -1,13 +1,14 @@
-import { PROGRAMS } from '../../data/programs';
+import { PROGRAMS, type Program } from '../../data/programs';
 
 // 서브뷰: 기업 지원금 안내 (원본 #employerPage, showView('employer'))
-export function EmployerView({ active, benefitYear, onDetail, onConsult }: {
+export function EmployerView({ active, benefitYear, programs = PROGRAMS, onDetail, onConsult }: {
   active: boolean;
   benefitYear: string;
+  programs?: Program[];
   onDetail: (programId: string) => void;
   onConsult: () => void;
 }) {
-  const list = PROGRAMS.filter(p => p.employer && p.employer.amount);
+  const list = programs.filter(p => p.employer && p.employer.amount);
   return (
     <div id="employerPage" className={'subpage' + (active ? ' active' : '')}>
       <section className="bd-hero">

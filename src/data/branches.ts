@@ -25,6 +25,14 @@ export interface Branch {
   contactManagerName: string;
   contactManagerEmail: string;
   mapUrl: string;
+  imagePath: string | null;
+  imagePath2: string | null;
+  imageZoom: number;
+  imagePositionX: number;
+  imagePositionY: number;
+  image2Zoom: number;
+  image2PositionX: number;
+  image2PositionY: number;
   region: string;
   hours: string;
   published: boolean;
@@ -47,6 +55,14 @@ export function makeDefaultBranch(name: string): Branch {
     contactManagerName: "담당자",
     contactManagerEmail: "contact@jmcareer.co.kr",
     mapUrl: "",
+    imagePath: null,
+    imagePath2: null,
+    imageZoom: 1,
+    imagePositionX: 50,
+    imagePositionY: 50,
+    image2Zoom: 1,
+    image2PositionX: 50,
+    image2PositionY: 50,
     region: DEFAULT_REGION_MAP[name] || "수도권",
     hours: DEFAULT_BRANCH_HOURS,
     published: true,

@@ -1,29 +1,67 @@
 import { lazy, Suspense, useRef, useState, type ComponentProps, type FormEvent } from 'react';
 import type { AdminPage as AdminPageComponent, BranchPatch } from './AdminPage';
-import { BranchSaveAuthError, saveAuthenticatedBranch, type BranchDirectoryRow } from '../../data/branchDirectory';
+import { BranchSaveAuthError, saveAuthenticatedBranch, uploadBranchImage, deleteBranchImage, saveBranchImageSettings, type BranchImageSlot, type BranchImageSettings, type BranchImageRow, type BranchDirectoryRow } from '../../data/branchDirectory';
 import { AdminSessionError } from '../../lib/supabase';
 import { useAdminSession } from './useAdminSession';
+import { SESSION_RENEWAL_WINDOW_SECONDS } from './adminSessionRenewal';
 import { AdminPasswordChange } from './AdminPasswordChange';
 import './AdminLogin.css';
+import { saveEmploymentContent, type EmploymentPatchRequest } from '../../data/employmentPrograms';
+import { saveSmartCareContent as saveSmartCareRequest, type SmartCarePatchRequest } from '../../data/smartCare';
 
 const AdminPage = lazy(() => import('./AdminPage').then(module => ({ default: module.AdminPage })));
 const LOGIN_ERROR = '아이디 또는 비밀번호를 확인해주세요.';
 const SERVICE_ERROR = '로그인 서비스를 사용할 수 없습니다. 관리자에게 문의해주세요.';
 
-export function AdminRoute(props: Omit<ComponentProps<typeof AdminPageComponent>, 'accountActions' | 'onSaveBranch'> & {
+export function AdminRoute(props: Omit<ComponentProps<typeof AdminPageComponent>, 'sessionActions' | 'accountActions' | 'onSaveBranch' | 'onUploadImage' | 'onDeleteImage' | 'onSaveImageSettings' | 'onSaveProgramContent' | 'onSaveSmartCareContent'> & {
   onBranchSaved: (saved: BranchDirectoryRow) => void;
+  onBranchImageSaved: (saved: BranchImageRow, slot: BranchImageSlot) => void;
 }) {
-  const { session, fixedSession, loading, serviceError, remaining, available, login, logout, getSaveAuthorization } = useAdminSession();
+  const { session, fixedSession, loading, serviceError, remaining, available, login, logout,
+    withSaveAuthorization, renewing, renewalMessage, renewSession } = useAdminSession();
   const [notice, setNotice] = useState('');
-  const saveBranch = async (slug: string, patch: BranchPatch): Promise<void> => {
+  const saveProgramContent = async (request: EmploymentPatchRequest) => {
     try {
-      const authorization = await getSaveAuthorization();
-      const saved = await saveAuthenticatedBranch(slug, patch, authorization);
-      props.onBranchSaved(saved);
+      return await withSaveAuthorization(authorization => saveEmploymentContent(request, authorization));
     } catch (cause) {
       if (cause instanceof BranchSaveAuthError) await logout(cause.message);
       throw cause;
     }
+  };
+  const saveSmartCareContent = async (request: SmartCarePatchRequest) => {
+    try {
+      return await withSaveAuthorization(authorization => saveSmartCareRequest(request, authorization));
+    } catch (cause) {
+      if (cause instanceof BranchSaveAuthError) await logout(cause.message);
+      throw cause;
+    }
+  };
+  const pendingBranchSaves = useRef(new Set<string>());
+  const saveBranch = async (slug: string, patch: BranchPatch): Promise<void> => {
+    if ([1, 2].some(slot => pendingImages.current.has(slug + ':' + slot)) || pendingBranchSaves.current.has(slug)) throw new Error('지사 정보를 처리 중입니다. 잠시 기다려주세요.');
+    pendingBranchSaves.current.add(slug);
+    try {
+      const saved = await withSaveAuthorization(authorization => saveAuthenticatedBranch(slug, patch, authorization));
+      props.onBranchSaved(saved);
+    } catch (cause) {
+      if (cause instanceof BranchSaveAuthError) await logout(cause.message);
+      throw cause;
+    } finally { pendingBranchSaves.current.delete(slug); }
+  };
+  const pendingImages = useRef(new Set<string>());
+  const changeImage = async (slug: string, slot: BranchImageSlot, operation: 'upload' | 'delete' | 'settings', value?: File | BranchImageSettings): Promise<void> => {
+    const key = slug + ':' + slot;
+    if (pendingImages.current.has(key) || pendingBranchSaves.current.has(slug)) throw new Error('사진을 처리 중입니다. 잠시 기다려주세요.');
+    pendingImages.current.add(key);
+    try {
+      const saved = await withSaveAuthorization(authorization => operation === 'upload' ? uploadBranchImage(slug, slot, value as File, authorization)
+        : operation === 'settings' ? saveBranchImageSettings(slug, slot, value as BranchImageSettings, authorization)
+        : deleteBranchImage(slug, slot, authorization));
+      props.onBranchImageSaved(saved, slot);
+    } catch (cause) {
+      if (cause instanceof BranchSaveAuthError) await logout(cause.message);
+      throw cause;
+    } finally { pendingImages.current.delete(key); }
   };
   const onPasswordChanged = async () => {
     setNotice('비밀번호가 변경되었습니다. 새 비밀번호로 다시 로그인해 주세요.');
@@ -37,13 +75,18 @@ export function AdminRoute(props: Omit<ComponentProps<typeof AdminPageComponent>
 
   return (
     <Suspense fallback={<div className="admin-login-shell" role="status">관리자 화면을 불러오는 중...</div>}>
-      <AdminPage {...props} onSaveBranch={saveBranch} accountActions={<>
-        <div className="admin-session-toolbar">
-          <span role="timer" aria-label="세션 남은 시간">세션 남은 시간 {time}</span>
-          <button type="button" className="admin-save-btn" onClick={() => { setNotice(''); void logout(); }}>로그아웃</button>
+      <AdminPage {...props} onSaveProgramContent={saveProgramContent} onSaveSmartCareContent={saveSmartCareContent} onSaveBranch={saveBranch} onUploadImage={(slug, slot, file) => changeImage(slug, slot, 'upload', file)} onDeleteImage={(slug, slot) => changeImage(slug, slot, 'delete')} onSaveImageSettings={(slug, slot, settings) => changeImage(slug, slot, 'settings', settings)} sessionActions={
+        <div className="admin-session-area">
+          <div className="admin-session-toolbar">
+            <span role="timer" aria-label="세션 남은 시간">세션 남은 시간 {time}</span>
+            <button type="button" className="admin-save-btn" disabled={renewing || remaining <= 0 || remaining > SESSION_RENEWAL_WINDOW_SECONDS}
+              onClick={() => { void renewSession(); }}>{renewing ? '연장 중...' : '세션 연장'}</button>
+            <button type="button" className="admin-save-btn" onClick={() => { setNotice(''); void logout(); }}>로그아웃</button>
+          </div>
+          <p className="admin-session-description">보안을 위해 관리자 로그인은 2시간 동안 유지됩니다. 시간이 만료되면 자동 로그아웃되며, 만료 30분 전부터 세션을 연장할 수 있습니다.</p>
+          <p className="admin-session-message" role="status">{renewalMessage}</p>
         </div>
-        <AdminPasswordChange onChanged={onPasswordChanged} />
-      </>} />
+      } accountActions={<AdminPasswordChange onChanged={onPasswordChanged} />} />
     </Suspense>
   );
 }

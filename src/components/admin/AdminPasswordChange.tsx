@@ -3,14 +3,10 @@ import { changeAdminPassword, PasswordChangeError } from '../../lib/supabase';
 import './AdminPasswordChange.css';
 
 export function AdminPasswordChange({ onChanged }: { onChanged: () => Promise<void> }) {
-  const [open, setOpen] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   return (
     <div className="admin-account-actions">
-      <div className="admin-account-toolbar">
-        <button type="button" className="admin-save-btn" aria-expanded={open} aria-controls="admin-password-panel"
-          onClick={() => setOpen(true)}>비밀번호 변경</button>
-      </div>
-      {open && <PasswordChangePanel onClose={() => setOpen(false)} onChanged={onChanged} />}
+      <PasswordChangePanel key={resetKey} onClose={() => setResetKey(key => key + 1)} onChanged={onChanged} />
     </div>
   );
 }

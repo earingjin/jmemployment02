@@ -1,17 +1,18 @@
 import { ProgramDetailBlocks } from '../components/ProgramDetailBlocks';
-import { findProgram } from '../data/programs';
+import { PROGRAMS, type Program } from '../data/programs';
 import type { ProgramView } from '../data/navigation';
 
 // 사업별 상세 페이지 (/employment-support, /job-leap, /future-experience, /senior-internship)
-// 4개 사업 모두 PROGRAMS(src/data/programs.ts)의 seeker/detail 데이터만 렌더링한다.
+// App에서 받은 동일한 고객 데이터의 seeker/detail을 렌더링한다.
 // 사업마다 detail 블록 구성이 다르므로 데이터에 존재하는 블록만 순서대로 표시하고, 없는 항목을 새로 만들지 않는다.
 // 국민취업지원제도의 Ⅰ유형/Ⅱ유형/취업성공수당 블록은 Hero와 같은 BENEFIT_GROUPS에서 생성된다.
-export function ProgramDetailPage({ programId, onBack, onConsult }: {
+export function ProgramDetailPage({ programId, programs = PROGRAMS, onBack, onConsult }: {
   programId: ProgramView;
+  programs?: Program[];
   onBack: () => void;
   onConsult: () => void;
 }) {
-  const program = findProgram(programId);
+  const program = programs.find(p => p.id === programId);
   if (!program) return null;
 
   return (
