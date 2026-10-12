@@ -10,6 +10,10 @@ import { ProgramDetailPage } from '../src/pages/ProgramDetailPage';
 import { EmployerView } from '../src/components/views/EmployerView';
 import { EmploymentProgramsEditor } from '../src/components/admin/EmploymentProgramsEditor';
 import { Header } from '../src/components/layout/Header';
+import { NetworkSection } from '../src/components/home/NetworkSection';
+import { ConsultationSection } from '../src/components/home/ConsultationSection';
+import { SmartCarePage } from '../src/pages/SmartCarePage';
+import { initialConsultationSettings, type ConsultationSnapshot } from '../src/data/consultation';
 import { PROGRAMS, BENEFIT_GROUPS } from '../src/data/programs';
 import { adaptCustomerPrograms } from '../src/data/customerProgramAdapter';
 import { getCustomerProgramFallback } from '../src/data/customerProgramFallback';
@@ -19,6 +23,52 @@ import { createInitialBranches } from '../src/data/branches';
 import { PROGRAM_VIEWS, VIEW_PATHS } from '../src/data/navigation';
 import { readFileSync } from 'node:fs';
 const noop=()=>{};
+function allElements(root: React.ReactNode): React.ReactElement<any>[] {
+  if (Array.isArray(root)) return root.flatMap(allElements);
+  if (!React.isValidElement<any>(root)) return [];
+  return [root, ...React.Children.toArray((root.props as { children?: React.ReactNode }).children).flatMap(allElements)];
+}
+test('actual customer CTA wiring: common desktop/mobile callbacks, five detail routes and selected business modals', async () => {
+  const settings = { ...initialConsultationSettings(), default: 'https://forms.gle/common' };
+  for (const id of [...PROGRAM_VIEWS, 'smartcare'] as const) settings[id] = 'https://forms.gle/' + id;
+  const snapshot = Promise.resolve<ConsultationSnapshot>({ settings, source: 'saved' });
+  const h = harness(() => HomePage({ branches: createInitialBranches(), benefitYear: '2026', customerPrograms: getCustomerProgramFallback(), consultationLoad: snapshot }));
+  const destinations: string[] = [];
+  const click = async (callback: () => void, expected: string) => {
+    callback(); await Promise.resolve(); assert.equal(destinations.at(-1), expected);
+  };
+  try {
+    (window as any).open = (url: string, target: string) => {
+      assert.equal(url, 'about:blank'); assert.equal(target, '_blank');
+      return { opener: null, closed: false, location: { replace(value: string) { destinations.push(value); } } };
+    };
+    let root = h.render();
+    for (const type of [Header, Hero, EmployerView, NetworkSection, ConsultationSection]) await click(findElement(root, type)!.props.onConsult, settings.default);
+    const mobile = allElements(root).find(element => element.type === 'button' && element.props.children === '상담 신청하기 ↗')!;
+    await click(mobile.props.onClick, settings.default);
+    root = await h.settle();
+    assert.equal(findElement(root, ConsultationSection)!.props.formUrl, settings.default);
+    // Both header menu buttons and mobile fixed CTA receive the same common callback.
+    const header = findElement(root, Header)!;
+    assert.equal(header.props.onConsult, findElement(root, Hero)!.props.onConsult);
+    for (const id of [...PROGRAM_VIEWS, 'smartcare'] as const) {
+      h.location.pathname = VIEW_PATHS[id]; h.emit('popstate'); root = h.render();
+      const component = findElement(root, id === 'smartcare' ? SmartCarePage : ProgramDetailPage)!;
+      await click(component.props.onConsult, settings[id]);
+      const page = id === 'smartcare' ? SmartCarePage(component.props) : ProgramDetailPage(component.props);
+      const buttons = allElements(page).filter(element => element.type === 'button' && element.props.children === '상담 신청');
+      assert.equal(buttons.length, id === 'smartcare' ? 1 : 2);
+      for (const button of buttons) await click(button.props.onClick, settings[id]);
+      await click(findElement(root, Header)!.props.onConsult, settings.default);
+    }
+    findElement(root, EmployerView)!.props.onDetail('field-training'); root = h.render();
+    await click(findElement(root, ProgramModal)!.props.onConsult, settings['field-training']);
+    findElement(root, EmployerView)!.props.onDetail('job-leap'); root = h.render();
+    await click(findElement(root, ProgramModal)!.props.onConsult, settings['job-leap']);
+    settings['job-leap'] = '';
+    await click(findElement(root, ProgramModal)!.props.onConsult, settings.default);
+  } finally { h.close(); }
+});
 // This is a static-derived contract fixture, NOT a captured DB seed.
 export function staticContractFixture(mirrors = false): PublicEmploymentPrograms {
   const updated_at = '2026-10-08T00:00:00Z';
@@ -132,7 +182,7 @@ test('App aborts pending public GET on unmount and ignores a late successful res
 });
 test('HomePage passes the same CMS snapshot to Hero, detail page, employer list and modal; existing navigation and modal switch remain',()=>{
   const customerPrograms=adaptCustomerPrograms(cmsFixture());
-  const h=harness(()=>HomePage({branches:createInitialBranches(),benefitYear:'2026',customerPrograms}));
+  const h=harness(()=>HomePage({branches:createInitialBranches(),benefitYear:'2026',consultationLoad:Promise.resolve({settings: {default: 'https://forms.gle/fixture', 'employment-support': '', 'job-leap': '', 'future-experience': '', 'field-training': '', smartcare: ''},source:'saved'}),customerPrograms}));
   try{
     let root=h.render();
     assert.equal(findElement(root,Hero)!.props.benefitGroups,customerPrograms.benefitGroups);
@@ -172,7 +222,7 @@ test('all customer displays show CMS amounts and text consistently; static defau
 test('mobile menu selection and deep-link reload retain existing routes and customer data',()=>{
   const data=adaptCustomerPrograms(cmsFixture());
   for(const programId of PROGRAM_VIEWS){
-    const h=harness(()=>HomePage({branches:createInitialBranches(),benefitYear:'2026',customerPrograms:data}),VIEW_PATHS[programId]);
+    const h=harness(()=>HomePage({branches:createInitialBranches(),benefitYear:'2026',consultationLoad:Promise.resolve({settings: {default: 'https://forms.gle/fixture', 'employment-support': '', 'job-leap': '', 'future-experience': '', 'field-training': '', smartcare: ''},source:'saved'}),customerPrograms:data}),VIEW_PATHS[programId]);
     try{const root=h.render();assert.equal(findElement(root,ProgramDetailPage)!.props.programId,programId);
       assert.equal(findElement(root,ProgramDetailPage)!.props.programs,data.programs);
     }finally{h.close();}

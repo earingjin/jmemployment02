@@ -3,7 +3,7 @@ import { DEFAULT_MAP_EMBED_URL, PUBLIC_BRANCH, branchSuffix, mapEmbedUrl, naverM
 import { PRESS_NEWS, REVIEWS, SMART_SOLUTIONS, type SmartSolution } from '../data/content';
 import type { CustomerProgramData } from '../data/customerProgramAdapter';
 import { ConsultationSection } from '../components/home/ConsultationSection';
-import { openConsultationForm } from '../data/consultation';
+import { consultationUrl, openLoadedConsultation, type ConsultationSnapshot } from '../data/consultation';
 import { LEGAL_CONTENT, type LegalContentId } from '../data/legal';
 import { LegalModal } from '../components/modals/LegalModal';
 import { Hero } from '../components/home/Hero';
@@ -33,13 +33,23 @@ const currentView = () => viewFromPath(window.location.pathname);
 const pushPath = (path: string) => { if (window.location.pathname !== path) window.history.pushState({}, '', path); };
 
 // 공개 사이트 전체 (원본 #publicPage)
-export function HomePage({ branches, benefitYear, customerPrograms, smartCareSolutions = SMART_SOLUTIONS }: {
+export function HomePage({ branches, benefitYear, customerPrograms, smartCareSolutions = SMART_SOLUTIONS, consultationLoad }: {
   branches: BranchMap;
+  consultationLoad: Promise<ConsultationSnapshot>;
   benefitYear: string;
   customerPrograms: CustomerProgramData;
   // App passes its single loaded snapshot; the static definition is only the safe default.
   smartCareSolutions?: readonly SmartSolution[];
 }) {
+  const [consultationSnapshot, setConsultationSnapshot] = useState<ConsultationSnapshot | null>(null);
+  useEffect(() => {
+    let active = true;
+    void consultationLoad.then(result => {
+      if (active) setConsultationSnapshot(result);
+      if (active && (result.source === 'error' || result.source === 'invalid')) console.error('상담 URL 설정 조회: ' + result.source + ' (기존 기본 URL 사용)');
+    });
+    return () => { active = false; };
+  }, [consultationLoad]);
   const [view, setView] = useState<View>(currentView);
   const publicRef = useRef<HTMLDivElement>(null);
   const [stickyConsultVisible, setStickyConsultVisible] = useState(false);
@@ -112,7 +122,8 @@ export function HomePage({ branches, benefitYear, customerPrograms, smartCareSol
   const closeProgramDetail = () => setProgramModal(m => ({ ...m, open: false }));
 
   // 원래 페이지와 모달 상태를 유지하며 상담 신청 폼을 새 탭에서 연다.
-  const goToConsult = openConsultationForm;
+  const consult = (id = 'default') => openLoadedConsultation(consultationLoad, id);
+  const goToConsult = () => consult();
 
   const openBranchMap = (branchName: string) => {
     const name = branchName || PUBLIC_BRANCH;
@@ -137,14 +148,14 @@ export function HomePage({ branches, benefitYear, customerPrograms, smartCareSol
   };
 
   return (
-    <div id="publicPage" ref={publicRef}>
+    <div id="publicPage" ref={publicRef} data-consultation-source={consultationSnapshot?.source ?? 'loading'}>
       <Header view={view} onNavigate={navigate} onConsult={goToConsult} />
 
       <div className={'page' + (view !== 'home' ? ' sub-mode' : ' mobile-home')}>
         <EmployerView programs={customerPrograms.programs} active={view === 'employer'} benefitYear={benefitYear} onDetail={id => openProgramDetail(id, 'employer')} onConsult={goToConsult} />
         <BranchDirectoryView active={view === 'branch'} branches={branches} region={bdRegion} onRegion={setBdRegion} onOpenMap={openBranchMap} />
-        {view === 'smartcare' && <SmartCarePage solutions={smartCareSolutions} onBack={goHome} onConsult={goToConsult} />}
-        {isProgramView(view) && <ProgramDetailPage programs={customerPrograms.programs} key={view} programId={view} onBack={goHome} onConsult={goToConsult} />}
+        {view === 'smartcare' && <SmartCarePage solutions={smartCareSolutions} onBack={goHome} onConsult={() => consult('smartcare')} />}
+        {isProgramView(view) && <ProgramDetailPage programs={customerPrograms.programs} key={view} programId={view} onBack={goHome} onConsult={() => consult(view)} />}
 
         <Hero benefitGroups={customerPrograms.benefitGroups} programLabel={customerPrograms.programs.find(p => p.id === 'employment-support')!.label} onConsult={goToConsult} onBranch={() => openBranchDirectory()} onDetail={() => navigate('employment-support')} />
         {view === 'home' && <>
@@ -166,7 +177,7 @@ export function HomePage({ branches, benefitYear, customerPrograms, smartCareSol
         <ReviewsSection onOpenReview={index => setReviewModal({ open: true, index })} />
         <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={() => navigate('employer')} />
         <NewsSection onOpenPress={index => setPressModal({ open: true, index })} />
-        <ConsultationSection onBranch={() => openBranchDirectory()} />
+        <ConsultationSection formUrl={consultationSnapshot ? consultationUrl(consultationSnapshot.settings) : undefined} onConsult={goToConsult} onBranch={() => openBranchDirectory()} />
         {view === 'home' && <section className="mobile-home-consult">
           <h2>취업 준비, 혼자 고민하지 마세요.</h2>
           <div className="mobile-home-consult-actions">
@@ -184,7 +195,7 @@ export function HomePage({ branches, benefitYear, customerPrograms, smartCareSol
 
       <LegalModal content={legalModal ? LEGAL_CONTENT[legalModal] : null} onClose={() => setLegalModal(null)} />
       <ProgramModal programs={customerPrograms.programs} open={programModal.open} programId={programModal.programId} audience={programModal.audience}
-        onClose={closeProgramDetail} onOpenDetail={openProgramDetail} onConsult={goToConsult} />
+        onClose={closeProgramDetail} onOpenDetail={openProgramDetail} onConsult={() => consult(programModal.programId ?? 'default')} />
       <ReviewModal open={reviewModal.open} review={reviewModal.index === null ? null : REVIEWS[reviewModal.index]}
         onClose={() => setReviewModal(m => ({ ...m, open: false }))} />
       <MapModal open={mapModal.open} content={mapModal.content} onClose={() => setMapModal(m => ({ ...m, open: false }))} />
