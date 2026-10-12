@@ -22,3 +22,7 @@
   #adminPage .admin-branch-list { max-height: 180px; }
   #adminPage .admin-topbar { flex-wrap: wrap; gap: 16px; }
 }
+
+.admin-consultation-field { margin-bottom: 24px; }
+.admin-consultation-current { overflow-wrap: anywhere; }
+.admin-consultation-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }

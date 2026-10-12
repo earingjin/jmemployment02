@@ -518,7 +518,7 @@ test('account management exposes the existing password form immediately with its
 test('administrator entry retains the branch default and search/editor while showing all four management menus first', () => {
   const branches = Object.fromEntries(ADMIN_BRANCHES.map(name => [name, makeDefaultBranch(name)]));
   const html = renderToStaticMarkup(createElement(AdminPage, { visible: true, openSeq: 0, branches, benefitYear: '2026',
-    onSaveBranch: async () => {}, onSaveBenefitYear: () => {}, onBack: () => {},
+    onSaveConsultation: async value => value, onSaveBranch: async () => {}, onSaveBenefitYear: () => {}, onBack: () => {},
     onUploadImage: async () => {}, onDeleteImage: async () => {}, onSaveImageSettings: async () => {},
     onSaveProgramContent: async () => fixture().program, onSaveSmartCareContent: async () => { throw new Error('unused'); } }));
   for (const label of ['지사 관리', '고용지원사업 관리', '사이트 공통 설정', '계정 관리']) assert.ok(html.includes(label));

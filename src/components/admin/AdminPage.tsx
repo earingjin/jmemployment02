@@ -6,6 +6,8 @@ import './AdminPage.css';
 import { EmploymentProgramsEditor, type SaveEmploymentContent } from './EmploymentProgramsEditor';
 import { SmartCareEditor, type SaveSmartCareContent } from './SmartCareEditor';
 
+import { ConsultationEditor, type SaveConsultation } from './ConsultationEditor';
+
 export type BranchPatch = Pick<Branch, 'phone' | 'address' | 'hours' | 'region'>;
 
 const managementTabs = [
@@ -17,11 +19,11 @@ const managementTabs = [
 ] as const;
 type ManagementTab = typeof managementTabs[number]['id'];
 // Tabs whose editor keeps unsaved drafts or in-flight saves; each owns its own leave guard.
-const guardedTabs = ['programs', 'smartcare'] as const satisfies readonly ManagementTab[];
+const guardedTabs = ['programs', 'smartcare', 'common'] as const satisfies readonly ManagementTab[];
 type GuardedTab = typeof guardedTabs[number];
 const isGuardedTab = (tab: ManagementTab): tab is GuardedTab => (guardedTabs as readonly ManagementTab[]).includes(tab);
 
-export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranch, onSaveBenefitYear, onBack, sessionActions, accountActions, onUploadImage, onDeleteImage, onSaveImageSettings, onSaveProgramContent, onSaveSmartCareContent }: {
+export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranch, onSaveBenefitYear, onBack, sessionActions, accountActions, onUploadImage, onDeleteImage, onSaveImageSettings, onSaveProgramContent, onSaveSmartCareContent, onSaveConsultation }: {
   visible: boolean;
   openSeq: number; // 관리자 화면을 열 때마다 증가 (원본 showAdmin()의 목록·편집기 재렌더링 시점)
   branches: BranchMap;
@@ -36,6 +38,7 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
   onSaveImageSettings: (slug: string, slot: BranchImageSlot, settings: BranchImageSettings) => Promise<void>;
   onSaveProgramContent: SaveEmploymentContent;
   onSaveSmartCareContent: SaveSmartCareContent;
+  onSaveConsultation: SaveConsultation;
 }) {
   const [activeSlug, setActiveSlug] = useState('본사');
   const [adminMode, setAdminMode] = useState<ManagementTab>('branch');
@@ -48,7 +51,8 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
   const [seenOpenSeq, setSeenOpenSeq] = useState(openSeq);
   const programLeaveGuard = useRef<() => boolean>(() => true);
   const smartCareLeaveGuard = useRef<() => boolean>(() => true);
-  const leaveGuards: Record<GuardedTab, typeof programLeaveGuard> = { programs: programLeaveGuard, smartcare: smartCareLeaveGuard };
+  const commonLeaveGuard = useRef<() => boolean>(() => true);
+  const leaveGuards: Record<GuardedTab, typeof programLeaveGuard> = { programs: programLeaveGuard, smartcare: smartCareLeaveGuard, common: commonLeaveGuard };
   // Only the active tab's editor is mounted, so only its guard can block leaving.
   const canLeaveCurrentTab = () => !isGuardedTab(adminMode) || leaveGuards[adminMode].current();
   const [programNavigationTarget, setProgramNavigationTarget] = useState<HTMLDivElement | null>(null);
@@ -73,7 +77,7 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
 
   return (
     <div id="adminPage" style={visible ? { display: 'block' } : undefined}>
-      <div className={'admin-shell' + (isGuardedTab(adminMode) ? ' admin-shell-programs' : '')}>
+      <div className={'admin-shell' + (['programs', 'smartcare'].includes(adminMode) ? ' admin-shell-programs' : '')}>
         <div className="admin-navigation-header">
           <header className="admin-management-header">
             <h1>본사 통합 관리자</h1>
@@ -144,7 +148,7 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
             {adminMode === 'smartcare' && <SmartCareEditor onSave={onSaveSmartCareContent} leaveGuard={smartCareLeaveGuard} navigationTarget={smartCareNavigationTarget} />}
           </div>
           <div id="admin-panel-common" role="tabpanel" aria-labelledby="admin-tab-common" hidden={adminMode !== 'common'}>
-            {commonEditorSeq > 0 && <CommonEditor key={commonEditorSeq} benefitYear={benefitYear} onSave={onSaveBenefitYear} />}
+            {adminMode === 'common' && <><CommonEditor key={commonEditorSeq} benefitYear={benefitYear} onSave={onSaveBenefitYear} /><ConsultationEditor onSave={onSaveConsultation} leaveGuard={commonLeaveGuard} /></>}
           </div>
           <div id="admin-panel-account" role="tabpanel" aria-labelledby="admin-tab-account" hidden={adminMode !== 'account'}>
             <h2 className="admin-card-title">계정 관리</h2>

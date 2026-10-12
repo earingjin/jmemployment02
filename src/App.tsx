@@ -10,6 +10,8 @@ import { HomePage } from './pages/HomePage';
 import { getCustomerProgramFallback, loadCustomerProgramsWithFallback } from './data/customerProgramFallback';
 import { getSmartCareFallback, loadSmartCareWithFallback } from './data/smartCare';
 
+import { loadCustomerConsultation, type ConsultationSnapshot } from './data/consultation';
+
 const AdminRoute = lazy(() =>
   import('./components/admin/AdminRoute').then(module => ({ default: module.AdminRoute }))
 );
@@ -76,6 +78,7 @@ function mergeRows(
 
 export default function App() {
   const [branches, setBranches] = useState(loadBranches);
+  const [consultationLoad, setConsultationLoad] = useState<Promise<ConsultationSnapshot>>(loadCustomerConsultation);
   const [customerPrograms, setCustomerPrograms] = useState(getCustomerProgramFallback);
   // One SmartCare snapshot shared by the home section, detail page and guide modal.
   const [smartCareSolutions, setSmartCareSolutions] = useState(getSmartCareFallback);
@@ -177,6 +180,7 @@ export default function App() {
           openSeq={0}
           branches={branches}
           benefitYear={benefitYear}
+          onConsultationSaved={settings => setConsultationLoad(Promise.resolve({ settings, source: 'saved' }))}
           onBranchSaved={applySavedBranch}
           onBranchImageSaved={applySavedBranchImage}
           onSaveBenefitYear={setBenefitYear}
@@ -190,5 +194,5 @@ export default function App() {
     );
   }
 
-  return <HomePage branches={branches} benefitYear={benefitYear} customerPrograms={customerPrograms} smartCareSolutions={smartCareSolutions} />;
+  return <HomePage branches={branches} benefitYear={benefitYear} customerPrograms={customerPrograms} smartCareSolutions={smartCareSolutions} consultationLoad={consultationLoad} />;
 }

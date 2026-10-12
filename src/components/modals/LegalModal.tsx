@@ -1,6 +1,34 @@
 import { useEffect, useRef } from 'react';
-import type { LegalContent } from '../../data/legal';
+import type { LegalBlock, LegalContent, LegalInline } from '../../data/legal';
 import { ModalCloseButton, ModalOverlay } from '../common/ModalOverlay';
+
+function renderInline(content: LegalInline[], keyPrefix: string) {
+  return content.map((part, index) => {
+    const key = `${keyPrefix}-${index}`;
+    if (typeof part === 'string') return part;
+    if ('strong' in part) return <strong key={key}>{part.strong}</strong>;
+    return <a key={key} href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>;
+  });
+}
+
+function renderBlock(block: LegalBlock, sectionIndex: number, blockIndex: number) {
+  const key = `${sectionIndex}-${blockIndex}`;
+  if (block.type === 'paragraph') return <p key={key}>{renderInline(block.content, key)}</p>;
+  if (block.type === 'list') {
+    const List = block.ordered ? 'ol' : 'ul';
+    return <List key={key} className={block.plain ? 'legal-modal-list-plain' : undefined}>{block.items.map((item, index) => <li key={`${key}-${index}`}>{renderInline(item, `${key}-${index}`)}</li>)}</List>;
+  }
+  return (
+    <div className="legal-modal-table-wrap" key={key}>
+      <table>
+        <thead><tr>{block.headers.map((header, index) => <th key={index} scope="col">{header}</th>)}</tr></thead>
+        <tbody>{block.rows.map((row, rowIndex) => (
+          <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{cell}</td>)}</tr>
+        ))}</tbody>
+      </table>
+    </div>
+  );
+}
 
 export function LegalModal({ content, onClose }: { content: LegalContent | null; onClose: () => void }) {
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -59,7 +87,8 @@ export function LegalModal({ content, onClose }: { content: LegalContent | null;
           {content?.sections.map((section, index) => (
             <section className="legal-modal-section" key={index}>
               {section.heading && <h3>{section.heading}</h3>}
-              <p>{section.body}</p>
+              {section.body !== undefined && <p>{section.body}</p>}
+              {section.blocks?.map((block, blockIndex) => renderBlock(block, index, blockIndex))}
             </section>
           ))}
         </div>

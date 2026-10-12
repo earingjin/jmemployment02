@@ -365,7 +365,7 @@ test('admin tabs: SmartCare tab exists and only the active tab guard can block t
   const branches = Object.fromEntries(ADMIN_BRANCHES.map(name => [name, makeDefaultBranch(name)]));
   let backs = 0;
   const h = harness(() => AdminPage({ visible: true, openSeq: 0, branches, benefitYear: '2026',
-    onSaveBranch: async () => {}, onSaveBenefitYear: () => {}, onBack: () => { backs++; },
+    onSaveConsultation: async value => value, onSaveBranch: async () => {}, onSaveBenefitYear: () => {}, onBack: () => { backs++; },
     onUploadImage: async () => {}, onDeleteImage: async () => {}, onSaveImageSettings: async () => {},
     onSaveProgramContent: async () => { throw new Error('unused'); }, onSaveSmartCareContent: async () => { throw new Error('unused'); } }));
   const tab = (root: React.ReactElement, id: string) => elements(root, e => e.props.id === 'admin-tab-' + id)[0];
