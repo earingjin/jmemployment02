@@ -1,9 +1,11 @@
+import type { PublicBranchStatus } from '../../data/publicBranches';
 import { ADMIN_BRANCHES, BRANCH_REGIONS, branchSuffix, type BranchMap } from '../../data/branches';
 
 // 서브뷰: 전국지사 안내 (원본 #branchDirectory, renderBranchDirectory())
 // 원본은 권역을 바꿀 때마다 탭·카드를 innerHTML로 새로 만들었다(전환 애니메이션 없이 즉시 변경). key에 권역을 넣어 같은 동작을 유지한다.
-export function BranchDirectoryView({ active, branches, region, onRegion, onOpenMap }: {
+export function BranchDirectoryView({ status = 'ready', active, branches, region, onRegion, onOpenMap }: {
   active: boolean;
+  status?: PublicBranchStatus;
   branches: BranchMap;
   region: string;
   onRegion: (region: string) => void;
@@ -25,12 +27,12 @@ export function BranchDirectoryView({ active, branches, region, onRegion, onOpen
       </section>
       <div className="bd-tabs" id="bdTabs">
         {['전체', ...BRANCH_REGIONS].map(r => {
-          const cnt = r === '전체' ? branchCount : all.filter(n => branches[n].region === r).length;
+          const cnt = r === '전체' ? branchCount : all.filter(n => n !== '본사' && branches[n].region === r).length;
           return <button key={`${region}-${r}`} className={'bd-tab' + (r === region ? ' active' : '')} onClick={() => onRegion(r)}>{r}<span className="cnt">{cnt}</span></button>;
         })}
       </div>
       <div className="bd-grid" id="bdGrid">
-        {list.length ? list.map(n => {
+        {status !== 'ready' ? <div role="status" style={{ padding: '40px', textAlign: 'center', color: '#78716C' }}>{status === 'loading' ? '지사 정보를 확인하고 있습니다.' : '지사 정보를 불러오지 못했습니다. 잠시 후 다시 확인해주세요.'}</div> : list.length ? list.map(n => {
           const b = branches[n];
           const tel = String(b.phone || '').replace(/[^0-9+]/g, '');
           return (

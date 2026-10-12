@@ -108,6 +108,7 @@ function harness(renderComponent: () => React.ReactElement, path = '/') {
     useState(initial:any){const i=cursor++;if(!(i in slots))slots[i]=typeof initial==='function'?initial():initial;
       return [slots[i],(value:any)=>{slots[i]=typeof value==='function'?value(slots[i]):value;}];},
     useRef(initial:any){const i=cursor++;return slots[i]??={current:initial};},
+    useCallback(callback:any,deps:unknown[]){const i=cursor++;if(!same(slots[i]?.deps,deps))slots[i]={deps,callback};return slots[i].callback;},
     useEffect(effect:()=>void|(()=>void),deps:unknown[]){const i=cursor++;if(!same(slots[i]?.deps,deps))effects.push(()=>{
       slots[i]?.cleanup?.();slots[i]={deps,effect,cleanup:effect()};});},
   };

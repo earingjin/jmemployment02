@@ -11,6 +11,7 @@ import { getCustomerProgramFallback, loadCustomerProgramsWithFallback } from './
 import { getSmartCareFallback, loadSmartCareWithFallback } from './data/smartCare';
 
 import { loadCustomerConsultation, type ConsultationSnapshot } from './data/consultation';
+import { usePublicBranchDirectory } from './data/publicBranches';
 
 const AdminRoute = lazy(() =>
   import('./components/admin/AdminRoute').then(module => ({ default: module.AdminRoute }))
@@ -18,31 +19,9 @@ const AdminRoute = lazy(() =>
 
 const currentPath = () => window.location.pathname.replace(/\/$/, '') || '/';
 
-const STORAGE_KEY = 'jmcareer_demo_branches';
-
 const API_URL =
   `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/branch-directory`;
 
-
-function loadBranches(): BranchMap {
-  const defaults = createInitialBranches();
-
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return defaults;
-
-    const parsed = JSON.parse(saved) as BranchMap;
-
-    return Object.fromEntries(
-      Object.entries(defaults).map(([slug, branch]) => [
-        slug,
-        { ...branch, ...(parsed[slug] || {}) },
-      ])
-    ) as BranchMap;
-  } catch {
-    return defaults;
-  }
-}
 
 function mergeRows(
   current: BranchMap,
@@ -77,7 +56,13 @@ function mergeRows(
 }
 
 export default function App() {
-  const [branches, setBranches] = useState(loadBranches);
+  const [branches, setBranches] = useState(createInitialBranches);
+  const publicDirectory = usePublicBranchDirectory(API_URL);
+  useEffect(() => {
+    if (publicDirectory.status === 'ready') {
+      setBranches(current => ({ ...current, ...publicDirectory.branches }));
+    }
+  }, [publicDirectory.branches, publicDirectory.status]);
   const [consultationLoad, setConsultationLoad] = useState<Promise<ConsultationSnapshot>>(loadCustomerConsultation);
   const [customerPrograms, setCustomerPrograms] = useState(getCustomerProgramFallback);
   // One SmartCare snapshot shared by the home section, detail page and guide modal.
@@ -113,51 +98,12 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchBranches() {
-      try {
-        const response = await fetch(API_URL, {
-          cache: 'no-store',
-        });
-
-        if (!response.ok) {
-          throw new Error('지사 정보 조회 실패');
-        }
-
-        const rows = await response.json() as BranchRow[];
-
-        if (cancelled) return;
-
-        setBranches(current => {
-          const next = mergeRows(current, rows);
-
-          localStorage.setItem(
-            STORAGE_KEY,
-            JSON.stringify(next)
-          );
-
-          return next;
-        });
-      } catch (error) {
-        console.error('Supabase 조회 실패:', error);
-      }
-    }
-
-    fetchBranches();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const applySavedBranch = (saved: BranchRow): void => {
     setBranches(current => {
       const updated = mergeRows(current, [saved]);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
+    void publicDirectory.refresh();
   };
 
   const applySavedBranchImage = (saved: BranchImageRow, slot: BranchImageSlot): void => {
@@ -167,9 +113,9 @@ export default function App() {
         ? { imagePath: saved.image_path, imageZoom: saved.image_zoom, imagePositionX: saved.image_position_x, imagePositionY: saved.image_position_y }
         : { imagePath2: saved.image_path_2, image2Zoom: saved.image_2_zoom, image2PositionX: saved.image_2_position_x, image2PositionY: saved.image_2_position_y };
       const updated = { ...current, [saved.slug]: { ...current[saved.slug], ...image } };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
+    void publicDirectory.refresh();
   };
 
   if (pathname === '/admin') {
@@ -185,6 +131,7 @@ export default function App() {
           onBranchImageSaved={applySavedBranchImage}
           onSaveBenefitYear={setBenefitYear}
           onBack={() => {
+            void publicDirectory.refresh();
             window.history.pushState({}, '', '/');
             setPathname('/');
             window.scrollTo({ top: 0 });
@@ -194,5 +141,5 @@ export default function App() {
     );
   }
 
-  return <HomePage branches={branches} benefitYear={benefitYear} customerPrograms={customerPrograms} smartCareSolutions={smartCareSolutions} consultationLoad={consultationLoad} />;
+  return <HomePage branches={publicDirectory.branches} branchStatus={publicDirectory.status} benefitYear={benefitYear} customerPrograms={customerPrograms} smartCareSolutions={smartCareSolutions} consultationLoad={consultationLoad} />;
 }
