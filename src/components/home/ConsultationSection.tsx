@@ -2,7 +2,7 @@ import { useId, useState } from 'react';
 import { CONSULTATION_FORM_URL } from '../../data/consultation';
 
 // 신청 정보 입력은 외부 구글 폼에서 진행한다.
-export function ConsultationSection() {
+export function ConsultationSection({ onBranch }: { onBranch: () => void }) {
   const [expanded, setExpanded] = useState(false);
   const panelId = useId();
   const headingId = useId();
@@ -29,7 +29,10 @@ export function ConsultationSection() {
             </ol>
             <p className="contact-program-guide-note">세부 지원 요건과 신청 가능 여부는 상담 및 해당 사업의 공식 공고를 통해 확인해 주세요.</p>
           </div>
-          <a className="btn-contact-submit" href={CONSULTATION_FORM_URL} target="_blank" rel="noopener noreferrer">상담 신청하기 (새 탭)</a>
+          <div className="contact-cta-stack">
+            <a className="btn-contact-submit" href={CONSULTATION_FORM_URL} target="_blank" rel="noopener noreferrer">상담 신청하기</a>
+            <button className="btn-branch-directory" type="button" onClick={onBranch}>전국 지사 확인하기</button>
+          </div>
         </div>
       </div>
     </section>

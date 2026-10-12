@@ -166,12 +166,12 @@ export function HomePage({ branches, benefitYear, customerPrograms, smartCareSol
         <ReviewsSection onOpenReview={index => setReviewModal({ open: true, index })} />
         <NetworkSection onBranch={() => openBranchDirectory()} onConsult={goToConsult} onEmployer={() => navigate('employer')} />
         <NewsSection onOpenPress={index => setPressModal({ open: true, index })} />
-        <ConsultationSection />
+        <ConsultationSection onBranch={() => openBranchDirectory()} />
         {view === 'home' && <section className="mobile-home-consult">
           <h2>취업 준비, 혼자 고민하지 마세요.</h2>
           <div className="mobile-home-consult-actions">
             <button type="button" onClick={goToConsult}>상담 신청하기 ↗</button>
-            <button type="button" onClick={() => openBranchDirectory()}>전국 지사 안내 ↗</button>
+            <button type="button" onClick={() => openBranchDirectory()}>전국 지사 확인하기</button>
           </div>
         </section>}
       <Footer onLegal={setLegalModal} />

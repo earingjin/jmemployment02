@@ -13,7 +13,7 @@ export function Footer({ onLegal }: {
         <div className="footer-legal">
           <div className="legal-links">
             {/* 원본의 공백·&nbsp; 구분자를 그대로 유지하기 위해 한 줄로 작성 */}
-            <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('terms')}>이용약관</button> &nbsp;ㅣ&nbsp; <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('privacy')}>개인정보취급방침</button> &nbsp;ㅣ&nbsp; <span>이메일 무단수집거부</span> &nbsp;ㅣ&nbsp; <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('ethics')}>취업윤리경영 · 직업상담사 윤리</button>
+            <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('terms')}>이용약관</button> &nbsp;ㅣ&nbsp; <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('privacy')}>개인정보처리방침</button> &nbsp;ㅣ&nbsp; <button className="footer-link-button" aria-haspopup="dialog" onClick={() => onLegal('ethics')}>직업상담사 윤리강령</button>
           </div>
           <div className="company-info">
             본사 : 서울특별시 영등포구 경인로 775 (문래동3가 55-20, 에이스하이테크시티 1동 9층) TEL. (02)703-9900 FAX. (02)703-9182<br />
