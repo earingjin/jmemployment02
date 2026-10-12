@@ -182,13 +182,6 @@ export const LEGAL_CONTENT: Record<LegalContentId, LegalContent> = {
           ['4. 본 약관과 관련한 분쟁에는 대한민국 법령을 적용하며, 관할 법원은 관련 법령에 따릅니다.']
         ] }
       ] },
-      { heading: '부칙', blocks: [
-        { type: 'paragraph', content: ['본 약관은 아래 시행일부터 적용합니다.'] },
-        { type: 'list', items: [
-          ['제정일자: 2026년 10월 1일'], ['시행일자: 2026년 10월 15일']
-        ] },
-        { type: 'paragraph', content: ['※ 본 문서는 홈페이지 이용약관 초안이며, 회사의 운영 정책 및 법률 검토를 거쳐 최종 확정합니다.'] }
-      ] }
     ]
   },
   privacy: {
@@ -291,10 +284,6 @@ export const LEGAL_CONTENT: Record<LegalContentId, LegalContent> = {
       ] },
       { heading: '제12조 (고지의 의무)', blocks: [
         { type: 'paragraph', content: ['본 개인정보처리방침의 내용 추가, 삭제, 변경이 있을 경우 변경사항 시행 7일 전부터 홈페이지를 통해 공지합니다. 다만, 이용자 권리에 중대한 변경이 있을 경우 최소 30일 전에 공지합니다.'] },
-        { type: 'paragraph', content: ['1차 개정'] },
-        { type: 'list', items: [
-          ['공고일자: 2026년 10월 1일'], ['시행일자: 2026년 10월 15일']
-        ] }
       ] }
     ]
   }
