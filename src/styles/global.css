@@ -1,5 +1,5 @@
 /*
- * 원본 index.html(현 index.legacy.html)의 <style> 블록 2개를 순서 그대로 옮긴 전역 CSS.
+ * 기존 단일 파일의 <style> 블록 2개를 순서 그대로 옮긴 전역 CSS.
  * 1단계(구조 이관)에서는 선택자·값을 변경하지 않는다. 변경점은 이미지 경로(src/assets → ../assets)뿐이다.
  */
 @font-face {
