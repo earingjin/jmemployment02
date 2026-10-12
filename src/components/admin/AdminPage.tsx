@@ -80,7 +80,7 @@ export function AdminPage({ visible, openSeq, branches, benefitYear, onSaveBranc
       <div className={'admin-shell' + (['programs', 'smartcare'].includes(adminMode) ? ' admin-shell-programs' : '')}>
         <div className="admin-navigation-header">
           <header className="admin-management-header">
-            <h1>본사 통합 관리자</h1>
+            <h1>관리자 페이지</h1>
             {sessionActions}
           </header>
           <div className="admin-management-tabs" role="tablist" aria-label="관리자 기능">
