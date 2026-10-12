@@ -18,6 +18,7 @@ import { MapModal, type MapModalContent } from '../components/modals/MapModal';
 import { PressModal } from '../components/modals/PressModal';
 import { ProgramModal, type Audience } from '../components/modals/ProgramModal';
 import { ReviewModal } from '../components/modals/ReviewModal';
+import type { PublicBranchStatus } from '../data/publicBranches';
 import { BranchDirectoryView } from '../components/views/BranchDirectoryView';
 import { EmployerView } from '../components/views/EmployerView';
 import { VIEW_PATHS, isProgramView, viewFromPath, type View } from '../data/navigation';
@@ -33,8 +34,9 @@ const currentView = () => viewFromPath(window.location.pathname);
 const pushPath = (path: string) => { if (window.location.pathname !== path) window.history.pushState({}, '', path); };
 
 // 공개 사이트 전체 (원본 #publicPage)
-export function HomePage({ branches, benefitYear, customerPrograms, smartCareSolutions = SMART_SOLUTIONS, consultationLoad }: {
+export function HomePage({ branches, branchStatus = 'ready', benefitYear, customerPrograms, smartCareSolutions = SMART_SOLUTIONS, consultationLoad }: {
   branches: BranchMap;
+  branchStatus?: PublicBranchStatus;
   consultationLoad: Promise<ConsultationSnapshot>;
   benefitYear: string;
   customerPrograms: CustomerProgramData;
@@ -128,6 +130,7 @@ export function HomePage({ branches, benefitYear, customerPrograms, smartCareSol
   const openBranchMap = (branchName: string) => {
     const name = branchName || PUBLIC_BRANCH;
     const b = branches[name];
+    if (!b?.published) return;
     setMapModal({
       open: true,
       content: {
@@ -153,7 +156,7 @@ export function HomePage({ branches, benefitYear, customerPrograms, smartCareSol
 
       <div className={'page' + (view !== 'home' ? ' sub-mode' : ' mobile-home')}>
         <EmployerView programs={customerPrograms.programs} active={view === 'employer'} benefitYear={benefitYear} onDetail={id => openProgramDetail(id, 'employer')} onConsult={goToConsult} />
-        <BranchDirectoryView active={view === 'branch'} branches={branches} region={bdRegion} onRegion={setBdRegion} onOpenMap={openBranchMap} />
+        <BranchDirectoryView status={branchStatus} active={view === 'branch'} branches={branches} region={bdRegion} onRegion={setBdRegion} onOpenMap={openBranchMap} />
         {view === 'smartcare' && <SmartCarePage solutions={smartCareSolutions} onBack={goHome} onConsult={() => consult('smartcare')} />}
         {isProgramView(view) && <ProgramDetailPage programs={customerPrograms.programs} key={view} programId={view} onBack={goHome} onConsult={() => consult(view)} />}
 
